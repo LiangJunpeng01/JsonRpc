@@ -82,6 +82,7 @@ namespace Sweet {  // 虽然在两个文件但是可以使用同一个命名空间
     }
     //---------------------------
 
+
     // 移动构造
     Sweet::string::string(string&& str) : _str(nullptr) {
         cout << "Sweet::string::string(string&& str) 移动构造" << endl;
