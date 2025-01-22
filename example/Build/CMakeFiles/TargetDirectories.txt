@@ -1,3 +1,0 @@
-/home/dio/Begin/JsonRpcFramework/example/Build/CMakeFiles/a.out.dir
-/home/dio/Begin/JsonRpcFramework/example/Build/CMakeFiles/edit_cache.dir
-/home/dio/Begin/JsonRpcFramework/example/Build/CMakeFiles/rebuild_cache.dir
