@@ -41,9 +41,7 @@ namespace RPC{
 #define ELOG(fomat, ...) LOG(LERR, fomat, ##__VA_ARGS__)
 
 
-/*  -- JsonUtil --  */
-
-
+/*  -- JSON --  */
 
 #include <iostream>
 
@@ -55,9 +53,7 @@ namespace RPC{
 
 #include <sstream>
 
-
-
-class JsonUtil{
+class JSON{
 public:
 
     static bool serialize(const Json::Value &, std::string &);
@@ -67,7 +63,7 @@ public:
 };
 
 
-bool JsonUtil::serialize(const Json::Value &val, std::string &body){
+bool JSON::serialize(const Json::Value &val, std::string &body){
     std::stringstream ss;
     Json::StreamWriterBuilder swb; // 实例化工厂对象
     std::unique_ptr<Json::StreamWriter> sw(swb.newStreamWriter()); 
@@ -80,7 +76,7 @@ bool JsonUtil::serialize(const Json::Value &val, std::string &body){
     return true;
 }
 
-bool JsonUtil::unserialize(const std::string &body, Json::Value &val){
+bool JSON::unserialize(const std::string &body, Json::Value &val){
     Json::CharReaderBuilder crb; // 实例化工厂对象
     std::unique_ptr<Json::CharReader> cr(crb.newCharReader());
 
@@ -92,5 +88,47 @@ bool JsonUtil::unserialize(const std::string &body, Json::Value &val){
     }
     return true;
 
+}
+
+/*  -- UUID --  */
+
+#include <chrono>
+
+#include <random>
+
+#include <atomic>
+
+#include <iomanip>
+
+class UUID{
+public:
+   static std::string uuid(); 
+}
+
+std::string uuid(){
+    std::stringstream ss;
+    // 1. 构造机器随机数对象
+    std::random_device rd;
+    // 2. 机器随机数对象作为种子构造随机数对象
+    std::mt19937 generate(rd());
+    // 3. 构造限定数据范围对象
+    std::uniform_int_distribution<int> distribution(0,255);
+    // 4. 生成八个随机数 
+    for(int i = 0; i<8; ++i){
+        if(i == 4 || i == 6) ss << "-";
+        ss << std::setw(2) << std::setfill('0') << std::hex << distribution(generate);
+    }
+    ss << "-";
+
+    // 5. 定义八字节序号 按照特定格式组织成为16进制数字字符串
+    static std::atomic<size_t> seq(1);
+    size_t cur = seq.fetch_add(1);
+
+    for(int i = 7; i>=0; --i){
+        if(i == 5) ss << "-";
+        ss << std::setw(2) << std::setfill('0') << std::hex << ((cur >> (i*8)) & 0xFF);
+    }
+    
+    return ss.str();
 }
 }
