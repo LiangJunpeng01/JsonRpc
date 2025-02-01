@@ -69,7 +69,7 @@ bool JSON::serialize(const Json::Value &val, std::string &body){
     std::unique_ptr<Json::StreamWriter> sw(swb.newStreamWriter()); 
     int ret = sw->write(val,&ss);
     if(ret != 0){
-        std::cout<<"json serialize error\n";
+        ELOG("json serialize error\n");
         return false;
     }
     body = ss.str();
@@ -102,8 +102,8 @@ bool JSON::unserialize(const std::string &body, Json::Value &val){
 
 class UUID{
 public:
-   static std::string uuid(); 
-}
+    static std::string uuid(); 
+};
 
 std::string uuid(){
     std::stringstream ss;
@@ -128,7 +128,7 @@ std::string uuid(){
         if(i == 5) ss << "-";
         ss << std::setw(2) << std::setfill('0') << std::hex << ((cur >> (i*8)) & 0xFF);
     }
-    
+
     return ss.str();
 }
 }

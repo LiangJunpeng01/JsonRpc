@@ -13,6 +13,7 @@
 
 #include <sstream>
 
+
 #define LOG1(msg) printf("%s\n",msg)
 
 #define LOG2(fomat, msg) printf("[%s: %d] " fomat "\n",__FILE__,__LINE__,msg);
@@ -107,7 +108,14 @@ std::string uuid(){
     return ss.str();
 }
 
+#include "abstract.hpp"
+
+#include "detail.hpp"
+
+#include "message.hpp"
+
 int main(){
+
 
 
     for(int i = 0;i<10;++i){
