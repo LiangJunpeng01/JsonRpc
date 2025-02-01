@@ -92,9 +92,28 @@ std::string errStr(RCode code){
     }
 }
 
+/* 请求类型 */
 enum class RType{
-    REQ_ASYNC = 0; // 异步请求
-    REQ_CALLBACK   // 回调请求
+    REQ_SYNC = 0, // 同步请求
+    REQ_ASYNC ,   // 异步请求
+    REQ_CALLBACK  // 回调请求
+};
+
+/* 主题操作类型 */
+enum class TopicOptype{
+    TOPIC_CREATE = 0, // 主题创建
+    TOPIC_REMOVE,     // 主题删除
+    TOPIC_SUBSCRIBE,  // 主题订阅
+    TOPIC_CANCEL,     // 主题取消订阅
+    TOPIC_PUBLISH     // 主题发布
+};
+
+/* 服务操作类型 */
+enum class ServiceOptype{
+    SERVICE_REGISTRY,   // 服务注册
+    SERVICE_DISCOVERY,  // 服务发现
+    SERVICE_ONLINE,     // 服务上线
+    SERVICE_OFFLINE     // 服务下线
 };
 
 }
