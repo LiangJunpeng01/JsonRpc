@@ -16,7 +16,7 @@
 
 #include <time.h>
 
-namespace RPC{
+namespace Rpc{
 
 #define LDBG 0 
 

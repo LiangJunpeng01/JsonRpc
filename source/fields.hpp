@@ -2,7 +2,7 @@
 
 #include <string>
 
-namespace RPC{
+namespace Rpc{
 /* 请求字段宏定义 */
 
 // RPC请求

@@ -6,7 +6,7 @@
 
 #include <functional>
 
-namespace RPC{
+namespace Rpc{
 
 class BaseMessage{
 public:
@@ -176,5 +176,5 @@ private:
 };
 
 
-} // namespace RPC
+} // namespace Rpc
 

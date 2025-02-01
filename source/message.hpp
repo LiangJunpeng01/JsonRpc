@@ -10,7 +10,7 @@
 
 #include "fields.hpp"
 
-namespace RPC{
+namespace Rpc{
 class JsonMessag : public BaseMessage{
 public:
     using ptr = std::shared_ptr<JsonMessag>;
@@ -38,4 +38,4 @@ bool JsonMessag::unserialize(const std::string &body){
 
 
 
-} // namespace RPC
+} // namespace Rpc
