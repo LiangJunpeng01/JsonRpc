@@ -1,5 +1,6 @@
-#pragma once
+#ifndef DETAIL_HPP
 
+#define DETAIL_HPP
 /*
  * 项目中需要使用的一些小功能
  *  * 1. 日志宏
@@ -131,4 +132,7 @@ std::string uuid(){
 
     return ss.str();
 }
+
 }
+
+#endif

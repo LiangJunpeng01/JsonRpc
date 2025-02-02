@@ -102,7 +102,8 @@ flags = [
 '-isystem',
 './build/release-install-cpp11/include'
 
-
+'-isystem',
+'/usr/include/jsoncpp'
 ]
 
 

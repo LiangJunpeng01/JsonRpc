@@ -8,6 +8,8 @@
 
 namespace Rpc{
 
+
+
 class BaseMessage{
 public:
     using ptr = std::shared_ptr<BaseMessage>;
