@@ -59,7 +59,20 @@ namespace Rpc
 
         // 主要针对响应状态码字段进行检查 是否正确 是否有效
         virtual bool check() override;
+
+        virtual RCode rcode();
+
+        virtual void setRCode(RCode);
     };
+    RCode JsonResponse::rcode()
+    {
+        return (RCode)_body[KEY_RCODE].asInt();
+    }
+
+    void JsonResponse::setRCode(RCode _rcode)
+    {
+        _body[KEY_RCODE] = (int)_rcode;
+    }
 
     bool JsonResponse::check()
     {
@@ -89,11 +102,11 @@ namespace Rpc
 
         std::string method(); // 服务端获取方法字段
 
-        void setMethod(const std::string &method); // 客户端设置方法字段
+        void setMethod(const std::string &); // 客户端设置方法字段
 
         Json::Value params(); // 服务端获取参数字段
 
-        void setParams(const Json::Value &params); // 客户端设置参数字段
+        void setParams(const Json::Value &); // 客户端设置参数字段
     };
 
     bool RpcRequest::check()
@@ -116,9 +129,9 @@ namespace Rpc
         return _body[KEY_METHOD].asString();
     }
 
-    void RpcRequest::setMethod(const std::string &method)
+    void RpcRequest::setMethod(const std::string &_method)
     {
-        _body[KEY_METHOD] = method;
+        _body[KEY_METHOD] = _method;
     }
 
     Json::Value RpcRequest::params()
@@ -126,9 +139,9 @@ namespace Rpc
         return _body[KEY_PARAMS];
     }
 
-    void RpcRequest::setParams(const Json::Value &params)
+    void RpcRequest::setParams(const Json::Value &_params)
     {
-        _body[KEY_PARAMS] = params;
+        _body[KEY_PARAMS] = _params;
     }
 
     /* -------------TopicRequest------------- */
@@ -180,9 +193,9 @@ namespace Rpc
         return _body[KEY_TOPIC_KEY].asString();
     }
 
-    void TopicRequest::setTopicKey(const std::string &key)
+    void TopicRequest::setTopicKey(const std::string &_key)
     {
-        _body[KEY_TOPIC_KEY] = key;
+        _body[KEY_TOPIC_KEY] = _key;
     }
 
     TopicOptype TopicRequest::topicOptype()
@@ -190,9 +203,9 @@ namespace Rpc
         return (TopicOptype)_body[KEY_OPTYPE].asInt();
     }
 
-    void TopicRequest::setTopicOptype(TopicOptype optype)
+    void TopicRequest::setTopicOptype(TopicOptype _optype)
     {
-        _body[KEY_OPTYPE] = (int)optype;
+        _body[KEY_OPTYPE] = (int)_optype;
     }
 
     std::string TopicRequest::topicMsg()
@@ -200,9 +213,9 @@ namespace Rpc
         return _body[KEY_TOPIC_MSG].asString();
     }
 
-    void TopicRequest::setTopicMsg(const std::string &msg)
+    void TopicRequest::setTopicMsg(const std::string &_msg)
     {
-        _body[KEY_TOPIC_MSG] = msg;
+        _body[KEY_TOPIC_MSG] = _msg;
     }
 
     /* -------------ServiceRequest------------- */
@@ -241,20 +254,23 @@ namespace Rpc
             ELOG("ServiceRequest %s 字段不存在或类型错误\n", KEY_OPTYPE);
             return false;
         }
-        if (_body[KEY_HOST].isNull() || (!_body[KEY_HOST].isObject()))
+        if (_body[KEY_OPTYPE].asInt() == (int)ServiceOptype::SERVICE_DISCOVERY)
         {
-            ELOG("ServiceRequest %s 字段不存在或类型错误\n", KEY_HOST);
-            return false;
-        }
-        if (_body[KEY_HOST_IP].isNull() || (!_body[KEY_HOST_IP].isString()))
-        {
-            ELOG("ServiceRequest %s 字段不存在或类型错误\n", KEY_HOST_IP);
-            return false;
-        }
-        if (_body[KEY_HOST_PORT].isNull() || (!_body[KEY_HOST_PORT].isIntegral()))
-        {
-            ELOG("ServiceRequest %s 字段不存在或类型错误\n", KEY_HOST_PORT);
-            return false;
+            if (_body[KEY_HOST].isNull() || (!_body[KEY_HOST].isObject()))
+            {
+                ELOG("ServiceRequest 服务发现时 %s 字段不存在或类型错误\n", KEY_HOST);
+                return false;
+            }
+            if (_body[KEY_HOST_IP].isNull() || (!_body[KEY_HOST_IP].isString()))
+            {
+                ELOG("ServiceRequest 服务发现时 %s 字段不存在或类型错误\n", KEY_HOST_IP);
+                return false;
+            }
+            if (_body[KEY_HOST_PORT].isNull() || (!_body[KEY_HOST_PORT].isIntegral()))
+            {
+                ELOG("ServiceRequest 服务发现时 %s 字段不存在或类型错误\n", KEY_HOST_PORT);
+                return false;
+            }
         }
 
         return true;
@@ -265,9 +281,9 @@ namespace Rpc
         return _body[KEY_METHOD].asString();
     }
 
-    void ServiceRequest::setMethod(const std::string &method)
+    void ServiceRequest::setMethod(const std::string &_method)
     {
-        _body[KEY_METHOD] = method;
+        _body[KEY_METHOD] = _method;
     }
 
     ServiceOptype ServiceRequest::serviceOptype()
@@ -275,9 +291,9 @@ namespace Rpc
         return (ServiceOptype)_body[KEY_OPTYPE].asInt();
     }
 
-    void ServiceRequest::setServiceOptype(ServiceOptype optype)
+    void ServiceRequest::setServiceOptype(ServiceOptype _optype)
     {
-        _body[KEY_OPTYPE] = (int)optype;
+        _body[KEY_OPTYPE] = (int)_optype;
     }
 
     Address ServiceRequest::host()
@@ -288,11 +304,153 @@ namespace Rpc
         return host;
     }
 
-    void ServiceRequest::setHost(const Address &host)
+    void ServiceRequest::setHost(const Address &_host)
     {
         Json::Value hostValue;
-        hostValue[KEY_HOST_IP] = host.first;
-        hostValue[KEY_HOST_PORT] = host.second;
+        hostValue[KEY_HOST_IP] = _host.first;
+        hostValue[KEY_HOST_PORT] = _host.second;
+    }
+
+    ///////////////////// response ////////////////////////
+
+    /* -------------RpcResponse------------- */
+
+    class RpcResponse : public JsonResponse
+    {
+    public:
+        using ptr = std::shared_ptr<RpcResponse>;
+
+        virtual bool check() override;
+
+        Json::Value result();
+
+        void setResult(const Json::Value &);
+    };
+
+    bool RpcResponse::check()
+    {
+        if (_body[KEY_RCODE].isNull() || (!_body[KEY_RCODE].isIntegral()))
+        {
+            ELOG("RpcResopnse %s 字段不存在或类型错误\n", KEY_RCODE);
+            return false;
+        }
+        if (_body[KEY_RESULT].isNull() || (!_body[KEY_RESULT].isObject()))
+        {
+            ELOG("RpcResopnse %s 字段不存在或类型错误\n", KEY_RESULT);
+            return false;
+        }
+        return true;
+    }
+
+    Json::Value RpcResponse::result()
+    {
+        return _body[KEY_RESULT];
+    }
+
+    void RpcResponse::setResult(const Json::Value &_result)
+    {
+        _body[KEY_RESULT] = _result;
+    }
+
+    /* -------------TopicResponse------------- */
+
+    class TopicResponse : public JsonResponse
+    {
+    public:
+        using ptr = std::shared_ptr<TopicResponse>;
+    };
+
+    /* -------------ServiceResponse------------- */
+
+    class ServiceResponse : public JsonResponse
+    {
+    public:
+        using ptr = std::shared_ptr<ServiceResponse>;
+
+        virtual bool check() override;
+
+        std::string method();
+
+        void setMethod(const std::string &);
+
+        std::vector<Address> hosts();
+
+        void setHosts(std::vector<Address>);
+
+        ServiceOptype serviceOptype();
+
+        void setServiceOptype(ServiceOptype);
+    };
+
+    bool ServiceResponse::check()
+    {
+        if (_body[KEY_RCODE].isNull() || (!_body[KEY_RCODE].isIntegral()))
+        {
+            ELOG("ServiceResopnse %s 字段不存在或类型错误\n", KEY_RCODE);
+            return false;
+        }
+        if (_body[KEY_OPTYPE].isNull() || (!_body[KEY_OPTYPE].isInt()))
+        {
+            ELOG("ServiceResopnse %s 字段不存在或类型错误\n", KEY_OPTYPE);
+            return false;
+        }
+
+        if (_body[KEY_OPTYPE].asInt() == (int)ServiceOptype::SERVICE_DISCOVERY /*判断是否为服务发现类型*/
+                &&                                                             /*服务发现类型需要判断方法字段与主机信息字段是否存在且类型是否有效*/
+                (_body[KEY_METHOD].isNull()) ||
+            (!_body[KEY_METHOD].isString()) ||
+            (_body[KEY_HOST].isNull()) ||
+            (!_body[KEY_HOST].isArray()))
+        {
+            ELOG("ServiceResopnse 信息字段错误\n");
+            return false;
+        }
+        return true;
+    }
+
+    std::string ServiceResponse::method()
+    {
+        return _body[KEY_METHOD].asString();
+    }
+
+    void ServiceResponse::setMethod(const std::string &_method)
+    {
+        _body[KEY_METHOD] = _method;
+    }
+
+    void ServiceResponse::setHosts(std::vector<Address> _hosts)
+    {
+        for (auto &it : _hosts)
+        {
+            Json::Value val;
+            val[KEY_HOST_IP] = it.first;
+            val[KEY_HOST_PORT] = it.second;
+            _body[KEY_HOST].append(val);
+        }
+    }
+
+    std::vector<Address> ServiceResponse::hosts()
+    {
+        std::vector<Address> _hosts;
+        int sz = _body[KEY_HOST].size();
+        for (int i = 0; i < sz; ++i)
+        {
+            Address addr;
+            addr.first = _body[KEY_HOST][i][KEY_HOST_IP].asString();
+            addr.second = _body[KEY_HOST][i][KEY_HOST_PORT].asInt();
+            _hosts.push_back(addr);
+        }
+        return _hosts;
+    }
+
+    ServiceOptype ServiceResponse::serviceOptype()
+    {
+        return (ServiceOptype)_body[KEY_OPTYPE].asInt();
+    }
+
+    void ServiceResponse::setServiceOptype(ServiceOptype _optype)
+    {
+        _body[KEY_OPTYPE] = (int)_optype;
     }
 
 } // namespace Rpc
