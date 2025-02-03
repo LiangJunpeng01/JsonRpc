@@ -111,12 +111,12 @@ namespace Rpc
 
     bool RpcRequest::check()
     {
-        if (_body[KEY_METHOD].isNull() || !_body[KEY_METHOD].isString())
+        if (_body[KEY_METHOD].isNull() || (!_body[KEY_METHOD].isString()))
         {
             ELOG("method 字段不存在 || method 字段类型错误");
             return false;
         }
-        if (_body[KEY_PARAMS].isNull() || !_body[KEY_PARAMS].isString())
+        if (_body[KEY_PARAMS].isNull() || (!_body[KEY_PARAMS].isObject()))
         {
             ELOG("params 字段不存在 || params 字段类型错误");
             return false;
@@ -254,19 +254,19 @@ namespace Rpc
             ELOG("ServiceRequest %s 字段不存在或类型错误\n", KEY_OPTYPE);
             return false;
         }
-        if (_body[KEY_OPTYPE].asInt() == (int)ServiceOptype::SERVICE_DISCOVERY)
+        if (_body[KEY_OPTYPE].asInt() != (int)ServiceOptype::SERVICE_DISCOVERY) // 发现服务无需传递主机信息 需要注册中心返回给客户端
         {
             if (_body[KEY_HOST].isNull() || (!_body[KEY_HOST].isObject()))
             {
                 ELOG("ServiceRequest 服务发现时 %s 字段不存在或类型错误\n", KEY_HOST);
                 return false;
             }
-            if (_body[KEY_HOST_IP].isNull() || (!_body[KEY_HOST_IP].isString()))
+            if (_body[KEY_HOST][KEY_HOST_IP].isNull() || (!_body[KEY_HOST][KEY_HOST_IP].isString()))
             {
                 ELOG("ServiceRequest 服务发现时 %s 字段不存在或类型错误\n", KEY_HOST_IP);
                 return false;
             }
-            if (_body[KEY_HOST_PORT].isNull() || (!_body[KEY_HOST_PORT].isIntegral()))
+            if (_body[KEY_HOST][KEY_HOST_PORT].isNull() || (!_body[KEY_HOST][KEY_HOST_PORT].isIntegral()))
             {
                 ELOG("ServiceRequest 服务发现时 %s 字段不存在或类型错误\n", KEY_HOST_PORT);
                 return false;
@@ -299,8 +299,8 @@ namespace Rpc
     Address ServiceRequest::host()
     {
         std::pair<std::string, int> host;
-        host.first = _body[KEY_HOST_IP].asString();
-        host.second = _body[KEY_HOST_PORT].asInt();
+        host.first = _body[KEY_HOST][KEY_HOST_IP].asString();
+        host.second = _body[KEY_HOST][KEY_HOST_PORT].asInt();
         return host;
     }
 
@@ -309,6 +309,7 @@ namespace Rpc
         Json::Value hostValue;
         hostValue[KEY_HOST_IP] = _host.first;
         hostValue[KEY_HOST_PORT] = _host.second;
+        _body[KEY_HOST] = hostValue;
     }
 
     ///////////////////// response ////////////////////////
@@ -452,5 +453,16 @@ namespace Rpc
     {
         _body[KEY_OPTYPE] = (int)_optype;
     }
+
+    class MessageFactory
+    {
+        /*简单工厂类*/
+    public:
+        template <typename T, typename... Args>
+        static BaseMessage::ptr create(Args &&...args)
+        {
+            return std::make_shared<T>(std::forward(args)...);
+        }
+    };
 
 } // namespace Rpc

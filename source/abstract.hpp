@@ -189,15 +189,4 @@ namespace Rpc
         MessageCallback _cb_message; // 消息处理回调
     };
 
-    class MessageFactory
-    {
-        /*简单工厂类*/
-    public:
-        template <typename T, typename... Args>
-        static BaseMessage::ptr create(Args &&...args)
-        {
-            return std::make_shared(std::forward(agrs)...);
-        }
-    };
-
 } // namespace Rpc
