@@ -4,11 +4,15 @@
 
 #include <memory>
 
-#include "abstract.hpp"
+#include <string>
+
+#include <vector>
+
+#include "fields.hpp"
 
 #include "detail.hpp"
 
-#include "fields.hpp"
+#include "abstract.hpp"
 
 namespace Rpc
 {
@@ -335,9 +339,9 @@ namespace Rpc
             ELOG("RpcResopnse %s 字段不存在或类型错误\n", KEY_RCODE);
             return false;
         }
-        if (_body[KEY_RESULT].isNull() || (!_body[KEY_RESULT].isObject()))
+        if (_body[KEY_RESULT].isNull())
         {
-            ELOG("RpcResopnse %s 字段不存在或类型错误\n", KEY_RESULT);
+            ELOG("RpcResopnse %s 字段不存\n", KEY_RESULT);
             return false;
         }
         return true;
@@ -403,7 +407,7 @@ namespace Rpc
             (_body[KEY_HOST].isNull()) ||
             (!_body[KEY_HOST].isArray()))
         {
-            ELOG("ServiceResopnse 信息字段错误\n");
+            ELOG("Discoverer ServiceResopnse 信息字段错误\n");
             return false;
         }
         return true;
@@ -459,10 +463,31 @@ namespace Rpc
         /*简单工厂类*/
     public:
         template <typename T, typename... Args>
-        static BaseMessage::ptr create(Args &&...args)
+        static std::shared_ptr<T> create(Args &&...args)
         {
             return std::make_shared<T>(std::forward(args)...);
         }
+
+        static Rpc::BaseMessage::ptr create(Rpc::MType);
     };
+    inline Rpc::BaseMessage::ptr MessageFactory::create(Rpc::MType mtype)
+    {
+        switch (mtype)
+        {
+        case MType::REQ_RPC:
+            return std::make_shared<RpcRequest>();
+        case MType::RSP_RPC:
+            return std::make_shared<RpcResponse>();
+        case MType::REQ_TOPIC:
+            return std::make_shared<TopicRequest>();
+        case MType::RSP_TOPIC:
+            return std::make_shared<TopicResponse>();
+        case MType::REQ_SERVICE:
+            return std::make_shared<ServiceRequest>();
+        case MType::RSP_SERVICE:
+            return std::make_shared<ServiceResponse>();
+        }
+        return BaseMessage::ptr();
+    }
 
 } // namespace Rpc

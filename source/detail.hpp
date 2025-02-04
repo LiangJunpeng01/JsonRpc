@@ -10,14 +10,43 @@
  * */
 
 /*  -- LOG --  */
+// #include <cstdio>
 
-#include <stdio.h>
+// #include <ctime>
 
-#include <time.h>
+// #include <iostream>
 
+// #include <string>
+
+// #include <jsoncpp/json/json.h>
+
+// #include <memory>
+
+// #include <sstream>
+
+#include <cstdio>
+
+#include <ctime>
+
+#include <iostream>
+
+#include <string>
+
+#include <jsoncpp/json/json.h>
+
+#include <memory>
+
+#include <sstream>
+
+#include <chrono>
+
+#include <random>
+
+#include <atomic>
+
+#include <iomanip>
 namespace Rpc
 {
-
 #define LDBG 0
 
 #define LINF 1
@@ -43,16 +72,6 @@ namespace Rpc
 #define ELOG(fomat, ...) LOG(LERR, fomat, ##__VA_ARGS__)
 
     /*  -- JSON --  */
-
-#include <iostream>
-
-#include <string>
-
-#include <jsoncpp/json/json.h>
-
-#include <memory>
-
-#include <sstream>
 
     class JSON
     {
@@ -93,14 +112,6 @@ namespace Rpc
     }
 
     /*  -- UUID --  */
-
-#include <chrono>
-
-#include <random>
-
-#include <atomic>
-
-#include <iomanip>
 
     class UUID
     {
