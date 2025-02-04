@@ -127,7 +127,7 @@ void TopicResponseTest()
 
     std::cout << (int)trp2->rcode() << std::endl;
 
-    // assert(trp2->check());
+    assert(trp2->check());
 }
 
 void ServiceResponseTest()
