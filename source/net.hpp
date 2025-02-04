@@ -20,8 +20,15 @@
 
 #include <arpa/inet.h>
 
+#include <unordered_map>
+
+#include <mutex>
+
 namespace Rpc
 {
+
+    /* -------------------- MuduoBuffer -------------------- */
+
     class MuduoBuffer : public BaseBuffer
     {
     public:
@@ -84,6 +91,8 @@ namespace Rpc
             return std::make_shared<MuduoBuffer>(std::forward(args)...);
         }
     };
+
+    /* -------------------- LVProtocol -------------------- */
 
     class LVProtocol : public BaseProtocol
     {
@@ -189,6 +198,8 @@ namespace Rpc
         }
     };
 
+    /* -------------------- MuduoConnection -------------------- */
+
     class MuduoConnection : public BaseConnection
     {
     public:
@@ -236,4 +247,225 @@ namespace Rpc
             // 传递参数包
         }
     };
+
+    /* -------------------- MuduoServer -------------------- */
+
+    class MuduoServer : public BaseServer
+    {
+    public:
+        using ptr = std::shared_ptr<MuduoServer>;
+
+        MuduoServer(int port) : _server(&_baseloop /* 事件监控对象 */,
+                                        muduo::net::InetAddress("0.0.0.0", port) /* 服务器所监听的地址与端口 */,
+                                        "MuduoServer" /* 服务器名称 */,
+                                        muduo::net::TcpServer::kNoReusePort /* 启用地址重用 */),
+                                _protocol(ProtocolFactory::create())
+        {
+        }
+
+        /* 服务器启动 */
+        virtual void start();
+
+    private:
+        void onConnection(const muduo::net::TcpConnectionPtr &);
+
+        void onMessage(const muduo::net::TcpConnectionPtr &, muduo::net::Buffer *, muduo::Timestamp);
+
+    private:
+        muduo::net::EventLoop _baseloop; // 事件监控对象
+        muduo::net::TcpServer _server;   // 服务端
+        std::mutex _mutex;
+
+        // 公共资源 需要互斥锁保护线程安全
+        std::unordered_map<muduo::net::TcpConnectionPtr, BaseConnection::ptr> _conns;
+        BaseProtocol::ptr _protocol;
+
+        const size_t maxSize = (1 << 16);
+    };
+
+    void MuduoServer::start()
+    {
+        _server.setConnectionCallback(std::bind(&MuduoServer::onConnection, this, std::placeholders::_1));
+        _server.setMessageCallback(std::bind(&MuduoServer::onMessage, this,
+                                             std::placeholders::_1,
+                                             std::placeholders::_2,
+                                             std::placeholders::_3));
+        _server.start();
+        _baseloop.loop();
+    }
+
+    void MuduoServer::onConnection(const muduo::net::TcpConnectionPtr &con)
+    {
+        if (con->connected())
+        {
+            std::cout << "连接建立\n";
+            BaseConnection::ptr muduo_con = ConnectionFactory::create(con, _protocol);
+
+            {
+                std::unique_lock<std::mutex> lock(_mutex); // RAII
+
+                _conns.insert({con, muduo_con}); // 管理映射关系
+            }
+
+            if (_cb_connection)
+                _cb_connection(muduo_con);
+        }
+        else
+        {
+            std::cout << "连接断开\n";
+            BaseConnection::ptr muduo_con;
+            {
+                std::unique_lock<std::mutex> lock(_mutex); // RAII
+                auto it = _conns.find(con);
+                if (it == _conns.end())
+                {
+                    return;
+                }
+                muduo_con = it->second;
+                _conns.erase(con);
+            }
+            if (_cb_close)
+                _cb_close(muduo_con);
+        }
+    }
+
+    void MuduoServer::onMessage(const muduo::net::TcpConnectionPtr &con, muduo::net::Buffer *buf, muduo::Timestamp)
+    {
+        auto base_buf = BufferFactory::create(buf);
+
+        while (1)
+        {
+            if (!_protocol->canProtocol(base_buf))
+            {
+                // 数据不足
+                if (base_buf->readableSize() > maxSize)
+                {
+                    // 数据错误导致数据堆积 远超最大数据存储大小
+                    con->shutdown();
+                    ELOG("数据错误导致数据堆积 超过最大数据可读大小\n");
+                    return;
+                }
+                break;
+            }
+            BaseMessage::ptr msg;
+            if (!_protocol->onMessage(base_buf, msg))
+            {
+                // 数据错误
+                con->shutdown();
+                // 硬性关闭连接主要考虑数据完整性 安全性 资源管理 与协议要求保证数据不会出现错误
+                ELOG("数据错误\n");
+                return;
+            }
+
+            BaseConnection::ptr base_con;
+            {
+                // RAII
+                std::unique_lock<std::mutex> lock(_mutex);
+
+                auto it = _conns.find(con);
+
+                if (it == _conns.end()) // 未找到该连接的映射关系
+                {
+                    con->shutdown(); // 关闭连接
+                    return;
+                }
+
+                base_con = it->second; // 找到映射关系 获取本地管理连接
+            }
+
+            if (_cb_message) // 如果用户设置了消息回调则调用消息回调
+            {
+                _cb_message(base_con, msg);
+            }
+        }
+    }
+
+    class ServerFactory
+    {
+    public:
+        template <typename... Args>
+        static BaseServer::ptr create(Args &&...args)
+        {
+            return std::make_shared<MuduoServer>(std::forward(args)...);
+        }
+    };
+
+    /* -------------------- MuduoClient -------------------- */
+
+    class MuduoClient : public BaseClient
+    {
+    public:
+        using ptr = std::shared_ptr<MuduoClient>;
+
+        MuduoClient(const std::string &ip, int port) : _baseloop(_loopthread.startLoop()),
+                                                       _downlatch(1), // 初始化计数器为 1
+                                                       _client(_baseloop, muduo::net::InetAddress(ip, port), "MuduoClient"),
+                                                       _protocol(ProtocolFactory::create())
+        {
+        }
+
+        /* 发起连接 */
+        void connect() override;
+
+        /* 连接关闭 */
+        void shutdown() override;
+
+        /* 消息发送 */
+        void send(const BaseMessage::ptr &) override;
+
+        /* 获取连接 */
+        BaseConnection::ptr connection() override;
+
+        /* 连接建立是否正常 */
+        bool connected() override;
+
+    private:
+        void onConnection(const muduo::net::TcpConnectionPtr &);
+
+        void onMessage(const muduo::net::TcpConnectionPtr &, muduo::net::Buffer *, muduo::Timestamp);
+
+    private:
+        /* 用于获取连接 */
+        BaseConnection::ptr _conn;
+
+        /* 计数同步 */
+        muduo::CountDownLatch _downlatch;
+
+        /* 事件监控 */
+        muduo::net::EventLoopThread _loopthread;
+        muduo::net::EventLoop *_baseloop;
+
+        /* 客户端 */
+        muduo::net::TcpClient _client;
+
+        BaseProtocol::ptr _protocol; // 协议对象
+    };
+
+    void MuduoClient::onConnection(const muduo::net::TcpConnectionPtr &con)
+    {
+        if (con->connected())
+        {
+            std::cout << "连接建立!!\n";
+            _downlatch.countDown(); // --计数器
+            _conn = ConnectionFactory::create(con, _protocol);
+        }
+        else
+        {
+            std::cout << "连接断开!!\n";
+            _conn.reset(); // reset 是unique_ptr的接口
+        }
+    }
+
+    void MuduoClient::connect()
+    {
+        _client.setConnectionCallback(std::bind(&MuduoClient::onConnection, this, std::placeholders::_1));
+        _client.setMessageCallback(std::bind(&MuduoClient::onMessage, this,
+                                             std::placeholders::_1,
+                                             std::placeholders::_2,
+                                             std::placeholders::_3));
+
+        _client.connect(); // 获取连接
+        _downlatch.wait(); // 等待计数 计数器不为0时阻塞执行流
+    }
+
 } // namespace Rpc

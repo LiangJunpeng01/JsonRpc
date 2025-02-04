@@ -109,7 +109,7 @@ namespace Rpc
     using CloseCallback = std::function<void(const BaseConnection::ptr &)>;
 
     /* 消息接收回调处理 */
-    using MessageCallback = std::function<void(const BaseConnection::ptr &, BaseBuffer::ptr &)>;
+    using MessageCallback = std::function<void(const BaseConnection::ptr &, BaseMessage::ptr &)>;
 
     class BaseServer
     {
