@@ -1,5 +1,7 @@
 #include "message.hpp"
 
+#include "net.hpp"
+
 #include <cassert>
 
 void RpcRequestTest()

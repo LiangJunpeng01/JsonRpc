@@ -137,7 +137,7 @@ namespace Rpc
         /* 服务器启动 */
         virtual void start() = 0;
 
-    private:
+    protected:
         ConnectionCallback _cb_connection; // 连接处理回调
 
         CloseCallback _cb_close; // 连接关闭回调
@@ -183,7 +183,7 @@ namespace Rpc
         /* 连接建立是否正常 */
         virtual bool connected() = 0;
 
-    private:
+    protected:
         ConnectionCallback _cb_connection; // 连接处理回调
 
         CloseCallback _cb_close; // 连接关闭回调
