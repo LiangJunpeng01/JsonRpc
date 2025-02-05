@@ -175,7 +175,7 @@ namespace Rpc
         virtual void shutdown() = 0;
 
         /* 消息发送 */
-        virtual void send(const BaseMessage::ptr &) = 0;
+        virtual bool send(const BaseMessage::ptr &) = 0;
 
         /* 获取连接 */
         virtual BaseConnection::ptr connection() = 0;

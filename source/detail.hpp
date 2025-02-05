@@ -53,7 +53,8 @@ namespace Rpc
 
 #define LERR 2
 
-#define LDEFAULT LINF
+#define LDEFAULT LDBG
+    // #define LDEFAULT LINF
 
 #define LOG(level, fomat, ...)                                                              \
     {                                                                                       \

@@ -24,6 +24,8 @@
 
 #include <mutex>
 
+#include "message.hpp"
+
 namespace Rpc
 {
 
@@ -88,7 +90,7 @@ namespace Rpc
         template <typename... Args>
         static BaseBuffer::ptr create(Args &&...args)
         {
-            return std::make_shared<MuduoBuffer>(std::forward(args)...);
+            return std::make_shared<MuduoBuffer>(std::forward<Args>(args)...);
         }
     };
 
@@ -123,10 +125,15 @@ namespace Rpc
 
     bool LVProtocol::canProtocol(const BaseBuffer::ptr &buf)
     {
-
+        if (buf->readableSize() < valuelength_len)
+        {
+            ELOG("数据不足\n");
+            return false;
+        }
         int32_t len = buf->peekInt32();
         if (buf->readableSize() < (len + valuelength_len)) // 当前可读数据大小小于总大小(不足完整数据)
         {
+            DLOG("缓冲区数据不足 当前缓冲区可读大小: %ld, 需读大小: %d + 4\n", buf->readableSize(), len);
             return false;
         }
         return true;
@@ -168,20 +175,24 @@ namespace Rpc
 
         std::string body = msg->serialize();
 
+        DLOG("Protocol 序列化成功: %s\n", body.c_str());
+
         // 手动转成网络字节序 - muduo库会进行一次网络字节序转主机字节序 因此先手动转换为网络字节序 (跨平台一致性)
-        MType mtype = (MType)htonl((int32_t)msg->mtype());
+        MType h_mtype = (MType)(int32_t)msg->mtype();
+        MType n_mtype = (MType)htonl((int32_t)msg->mtype());
 
-        int32_t id_length = htonl(id.size());
+        int32_t h_id_length = id.size();
+        int32_t n_id_length = htonl(id.size());
 
-        int32_t total_length = htonl(body.size() + mtype_len + id_length + idlength_len);
+        int32_t total_length = htonl(body.size() + mtype_len + h_id_length + idlength_len);
 
         std::string result;
         result.reserve(total_length); // 预先开辟空间
 
         // 采用二进制的方式
         result.append((char *)&total_length, valuelength_len);
-        result.append((char *)&mtype, mtype_len);
-        result.append((char *)&id_length, idlength_len);
+        result.append((char *)&n_mtype, mtype_len);
+        result.append((char *)&n_id_length, idlength_len);
         result.append(id);
         result.append(body);
 
@@ -194,7 +205,7 @@ namespace Rpc
         template <typename... Args>
         static BaseProtocol::ptr create(Args &&...args)
         {
-            return std::make_shared<LVProtocol>(std::forward(args)...);
+            return std::make_shared<LVProtocol>(std::forward<Args>(args)...);
         }
     };
 
@@ -243,7 +254,7 @@ namespace Rpc
         template <typename... Args>
         static BaseConnection::ptr create(Args &&...args)
         {
-            return std::make_shared<MuduoConnection>(std::forward(args)...);
+            return std::make_shared<MuduoConnection>(std::forward<Args>(args)...);
             // 传递参数包
         }
     };
@@ -333,11 +344,14 @@ namespace Rpc
     {
         auto base_buf = BufferFactory::create(buf);
 
+        DLOG("服务端接收到新连接\n");
         while (1)
         {
+
             if (!_protocol->canProtocol(base_buf))
             {
                 // 数据不足
+                DLOG("数据不足\n");
                 if (base_buf->readableSize() > maxSize)
                 {
                     // 数据错误导致数据堆积 远超最大数据存储大小
@@ -366,15 +380,18 @@ namespace Rpc
 
                 if (it == _conns.end()) // 未找到该连接的映射关系
                 {
+                    DLOG("未找到该连接的映射\n");
                     con->shutdown(); // 关闭连接
                     return;
                 }
 
+                DLOG("base_con 获取成功\n");
                 base_con = it->second; // 找到映射关系 获取本地管理连接
             }
 
             if (_cb_message) // 如果用户设置了消息回调则调用消息回调
             {
+                DLOG("_cb_message回调被设置 调用该回调")
                 _cb_message(base_con, msg);
             }
         }
@@ -386,7 +403,7 @@ namespace Rpc
         template <typename... Args>
         static BaseServer::ptr create(Args &&...args)
         {
-            return std::make_shared<MuduoServer>(std::forward(args)...);
+            return std::make_shared<MuduoServer>(std::forward<Args>(args)...);
         }
     };
 
@@ -411,7 +428,7 @@ namespace Rpc
         void shutdown() override;
 
         /* 消息发送 */
-        void send(const BaseMessage::ptr &) override;
+        bool send(const BaseMessage::ptr &) override;
 
         /* 获取连接 */
         BaseConnection::ptr connection() override;
@@ -439,6 +456,8 @@ namespace Rpc
         muduo::net::TcpClient _client;
 
         BaseProtocol::ptr _protocol; // 协议对象
+
+        const size_t maxSize = (1 << 16); // 最大数据存储大小
     };
 
     void MuduoClient::onConnection(const muduo::net::TcpConnectionPtr &con)
@@ -456,6 +475,41 @@ namespace Rpc
         }
     }
 
+    void MuduoClient::onMessage(const muduo::net::TcpConnectionPtr &con, muduo::net::Buffer *buf, muduo::Timestamp)
+    {
+        auto base_buf = BufferFactory::create(buf);
+
+        while (1)
+        {
+            if (!_protocol->canProtocol(base_buf))
+            {
+                // 数据不足
+                if (base_buf->readableSize() > maxSize)
+                {
+                    // 数据错误导致数据堆积 远超最大数据存储大小
+                    con->shutdown();
+                    ELOG("数据错误导致数据堆积 超过最大数据可读大小\n");
+                    return;
+                }
+                break;
+            }
+            BaseMessage::ptr msg;
+            if (!_protocol->onMessage(base_buf, msg))
+            {
+                // 数据错误
+                con->shutdown();
+                // 硬性关闭连接主要考虑数据完整性 安全性 资源管理 与协议要求保证数据不会出现错误
+                ELOG("数据错误\n");
+                return;
+            }
+
+            if (_cb_message) // 如果用户设置了消息回调则调用消息回调
+            {
+                _cb_message(_conn, msg);
+            }
+        }
+    }
+
     void MuduoClient::connect()
     {
         _client.setConnectionCallback(std::bind(&MuduoClient::onConnection, this, std::placeholders::_1));
@@ -468,4 +522,41 @@ namespace Rpc
         _downlatch.wait(); // 等待计数 计数器不为0时阻塞执行流
     }
 
+    void MuduoClient::shutdown()
+    {
+        _client.disconnect();
+    }
+
+    /* 消息发送 */
+    bool MuduoClient::send(const BaseMessage::ptr &msg)
+    {
+        if (connected())
+        {
+            _conn->send(msg);
+            return true;
+        }
+
+        ELOG("连接断开");
+        return false;
+    }
+    /* 获取连接 */
+    BaseConnection::ptr MuduoClient::connection()
+    {
+        return _conn;
+    }
+    /* 连接建立是否正常 */
+    bool MuduoClient::connected()
+    {
+        return (_conn && _conn->connected());
+    }
+
+    class ClientFactory
+    {
+    public:
+        template <typename... Args>
+        static BaseClient::ptr create(Args &&...args)
+        {
+            return std::make_shared<MuduoClient>(std::forward<Args>(args)...);
+        }
+    };
 } // namespace Rpc
