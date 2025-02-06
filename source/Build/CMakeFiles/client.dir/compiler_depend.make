@@ -410,7 +410,8 @@ CMakeFiles/client.dir/client.cpp.o: ../client.cpp \
   ../message.hpp \
   /usr/include/c++/11/thread \
   /usr/include/c++/11/bits/std_thread.h \
-  /usr/include/c++/11/bits/this_thread_sleep.h
+  /usr/include/c++/11/bits/this_thread_sleep.h \
+  ../dispatcher.hpp
 
 
 ../message.hpp:
@@ -1068,6 +1069,8 @@ CMakeFiles/client.dir/client.cpp.o: ../client.cpp \
 /usr/include/c++/11/bits/range_access.h:
 
 /usr/include/c++/11/iterator:
+
+../dispatcher.hpp:
 
 /usr/include/boost/type_index/type_index_facade.hpp:
 

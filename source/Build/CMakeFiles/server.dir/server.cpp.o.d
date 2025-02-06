@@ -336,4 +336,5 @@ CMakeFiles/server.dir/server.cpp.o: \
  /usr/include/arpa/inet.h /usr/include/c++/11/mutex \
  /usr/include/c++/11/bits/std_mutex.h \
  /usr/include/c++/11/bits/unique_lock.h \
- /home/dio/Begin/JsonRpcFramework/source/message.hpp
+ /home/dio/Begin/JsonRpcFramework/source/message.hpp \
+ /home/dio/Begin/JsonRpcFramework/source/dispatcher.hpp

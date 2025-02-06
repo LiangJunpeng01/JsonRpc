@@ -338,4 +338,5 @@ CMakeFiles/client.dir/client.cpp.o: \
  /usr/include/c++/11/bits/unique_lock.h \
  /home/dio/Begin/JsonRpcFramework/source/message.hpp \
  /usr/include/c++/11/thread /usr/include/c++/11/bits/std_thread.h \
- /usr/include/c++/11/bits/this_thread_sleep.h
+ /usr/include/c++/11/bits/this_thread_sleep.h \
+ /home/dio/Begin/JsonRpcFramework/source/dispatcher.hpp

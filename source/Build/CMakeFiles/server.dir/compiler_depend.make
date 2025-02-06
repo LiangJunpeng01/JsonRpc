@@ -407,7 +407,8 @@ CMakeFiles/server.dir/server.cpp.o: ../server.cpp \
   /usr/include/c++/11/mutex \
   /usr/include/c++/11/bits/std_mutex.h \
   /usr/include/c++/11/bits/unique_lock.h \
-  ../message.hpp
+  ../message.hpp \
+  ../dispatcher.hpp
 
 
 ../message.hpp:
@@ -1057,6 +1058,8 @@ CMakeFiles/server.dir/server.cpp.o: ../server.cpp \
 /usr/include/c++/11/bits/range_access.h:
 
 /usr/include/c++/11/iterator:
+
+../dispatcher.hpp:
 
 /usr/include/boost/type_index/type_index_facade.hpp:
 
