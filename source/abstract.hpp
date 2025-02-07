@@ -30,6 +30,7 @@ namespace Rpc
         /* 设置消息类型 */
         virtual void setMType(MType mtype)
         {
+            // ELOG("BaseMessage::setMtype:%d\n", (int)mtype);
             _mtype = mtype;
         }
 

@@ -59,6 +59,8 @@
         "thread": "cpp",
         "typeinfo": "cpp",
         "internet": "cpp",
-        "socket": "cpp"
+        "socket": "cpp",
+        "*.ipp": "cpp",
+        "executor": "cpp"
     }
 }

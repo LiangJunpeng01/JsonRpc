@@ -1,3 +1,5 @@
+#pragma once
+
 #include <muduo/net/TcpServer.h>
 
 #include <muduo/net/EventLoop.h>
@@ -143,6 +145,7 @@ namespace Rpc
     {
         int32_t total_len = buf->readInt32();
         MType mtype = (MType)buf->readInt32();
+        // DLOG("LVProtocol::onMessage->mtype: %d\n", (int)mtype);
         int32_t id_len = buf->readInt32();
         std::string mid = buf->retrieveAsString(id_len);
         int32_t body_len = total_len - id_len - idlength_len - mtype_len;
@@ -170,15 +173,19 @@ namespace Rpc
 
     std::string LVProtocol::serialize(const BaseMessage::ptr &msg)
     {
+
+        // DLOG("LVProtocol 序列化前msg->mtype: %d\n", (int)msg->mtype());
+        // TODO
+
         // 序列化
         std::string id = msg->rid();
 
         std::string body = msg->serialize();
 
-        DLOG("Protocol 序列化成功: %s\n", body.c_str());
+        // DLOG("Protocol 序列化成功: %s\n", body.c_str());
 
         // 手动转成网络字节序 - muduo库会进行一次网络字节序转主机字节序 因此先手动转换为网络字节序 (跨平台一致性)
-        MType h_mtype = (MType)(int32_t)msg->mtype();
+        MType h_mtype = msg->mtype();
         MType n_mtype = (MType)htonl((int32_t)msg->mtype());
 
         int32_t h_id_length = id.size();
@@ -502,6 +509,8 @@ namespace Rpc
                 ELOG("数据错误\n");
                 return;
             }
+
+            // DLOG("MuduoClient::onMessage - msg->mtype: %d\n", (int)msg->mtype());
 
             if (_cb_message) // 如果用户设置了消息回调则调用消息回调
             {
