@@ -55,7 +55,7 @@ namespace Rpc
         RCODE_NOT_FOUND_SERVICE,
         RCODE_INVALID_OPTYPE,
         RCODE_NOT_FOUND_TOPIC,
-        RCODE_INTERNAL_ERROR
+        RCODE_INTERNAL_ERROR // 服务器内部错误
     };
 
     std::string errStr(RCode code)
