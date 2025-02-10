@@ -99,8 +99,13 @@ namespace Rpc
     /* 请求类型 */
     enum class RType
     {
-        REQ_SYNC = 0, // 同步请求
-        REQ_ASYNC,    // 异步请求
+        //        REQ_SYNC = 0, // 同步请求
+        /* 
+           无需同步请求 
+           同步请求可以在异步请求中通过promise 返回 future对象通过get进行一个同步操作 
+           因此提供同步请求操作是一个冗余操作
+        */
+        REQ_ASYNC = 0,    // 异步请求
         REQ_CALLBACK  // 回调请求
     };
 

@@ -1,4 +1,4 @@
-# Install script for directory: /home/dio/Begin/JsonRpcFramework/source
+# Install script for directory: /home/dio/Begin/JsonRpcFramework/source/common
 
 # Set the install prefix
 if(NOT DEFINED CMAKE_INSTALL_PREFIX)
@@ -50,5 +50,5 @@ endif()
 
 string(REPLACE ";" "\n" CMAKE_INSTALL_MANIFEST_CONTENT
        "${CMAKE_INSTALL_MANIFEST_FILES}")
-file(WRITE "/home/dio/Begin/JsonRpcFramework/source/Build/${CMAKE_INSTALL_MANIFEST}"
+file(WRITE "/home/dio/Begin/JsonRpcFramework/source/common/Build/${CMAKE_INSTALL_MANIFEST}"
      "${CMAKE_INSTALL_MANIFEST_CONTENT}")

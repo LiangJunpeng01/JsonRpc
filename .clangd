@@ -1,0 +1,13 @@
+CompileFlags:
+  Add:
+    - -std=c++17
+    - -I${workspaceFolder}/source             # 包含项目内源文件目录
+    - -I${workspaceFolder}/build/release-install-cpp11/include  # 包含 Muduo 的 include 路径
+    - -I${workspaceFolder}/example             # 包添加 eg/中示例代码引用 默认屏蔽如不需
+
+If:
+  PathMatch: .*/example/.*
+  CompileFlags:                      
+    Add:
+      - -DEXAMPLE_MODE_ENABLED=1      
+

@@ -4,7 +4,7 @@
 # compile CXX with /usr/bin/c++
 CXX_DEFINES = 
 
-CXX_INCLUDES = -I/home/dio/Begin/JsonRpcFramework/source/../build/release-install-cpp11/include
+CXX_INCLUDES = -I/home/dio/Begin/JsonRpcFramework/source/common/../../build/release-install-cpp11/include
 
 CXX_FLAGS = -g
 

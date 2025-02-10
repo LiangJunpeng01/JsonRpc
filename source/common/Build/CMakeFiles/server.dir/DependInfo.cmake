@@ -8,7 +8,7 @@ set(CMAKE_DEPENDS_LANGUAGES
 
 # The set of dependency files which are needed:
 set(CMAKE_DEPENDS_DEPENDENCY_FILES
-  "/home/dio/Begin/JsonRpcFramework/source/server.cpp" "CMakeFiles/server.dir/server.cpp.o" "gcc" "CMakeFiles/server.dir/server.cpp.o.d"
+  "/home/dio/Begin/JsonRpcFramework/source/common/server.cpp" "CMakeFiles/server.dir/server.cpp.o" "gcc" "CMakeFiles/server.dir/server.cpp.o.d"
   )
 
 # Targets to which this target links.

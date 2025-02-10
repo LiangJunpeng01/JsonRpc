@@ -231,6 +231,7 @@ namespace Rpc
                 ELOG("返回值类型校验失败: %s\n", req->method().c_str());
                 return response(con, req, Json::Value(), RCode::RCODE_INTERNAL_ERROR);
             }
+            // 组织响应 发送给客户端
             response(con, req, result, RCode::RCODE_OK);
         }
 

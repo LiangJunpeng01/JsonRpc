@@ -1,10 +1,10 @@
 CMakeFiles/server.dir/server.cpp.o: \
- /home/dio/Begin/JsonRpcFramework/source/server.cpp \
+ /home/dio/Begin/JsonRpcFramework/source/common/server.cpp \
  /usr/include/stdc-predef.h \
- /home/dio/Begin/JsonRpcFramework/source/net.hpp \
- /home/dio/Begin/JsonRpcFramework/source/../build/release-install-cpp11/include/muduo/net/TcpServer.h \
- /home/dio/Begin/JsonRpcFramework/source/../build/release-install-cpp11/include/muduo/base/Atomic.h \
- /home/dio/Begin/JsonRpcFramework/source/../build/release-install-cpp11/include/muduo/base/noncopyable.h \
+ /home/dio/Begin/JsonRpcFramework/source/common/net.hpp \
+ /home/dio/Begin/JsonRpcFramework/source/common/../../build/release-install-cpp11/include/muduo/net/TcpServer.h \
+ /home/dio/Begin/JsonRpcFramework/source/common/../../build/release-install-cpp11/include/muduo/base/Atomic.h \
+ /home/dio/Begin/JsonRpcFramework/source/common/../../build/release-install-cpp11/include/muduo/base/noncopyable.h \
  /usr/lib/gcc/x86_64-linux-gnu/11/include/stdint.h /usr/include/stdint.h \
  /usr/include/x86_64-linux-gnu/bits/libc-header-start.h \
  /usr/include/features.h /usr/include/features-time64.h \
@@ -20,7 +20,7 @@ CMakeFiles/server.dir/server.cpp.o: \
  /usr/include/x86_64-linux-gnu/bits/wchar.h \
  /usr/include/x86_64-linux-gnu/bits/stdint-intn.h \
  /usr/include/x86_64-linux-gnu/bits/stdint-uintn.h \
- /home/dio/Begin/JsonRpcFramework/source/../build/release-install-cpp11/include/muduo/base/Types.h \
+ /home/dio/Begin/JsonRpcFramework/source/common/../../build/release-install-cpp11/include/muduo/base/Types.h \
  /usr/include/string.h /usr/lib/gcc/x86_64-linux-gnu/11/include/stddef.h \
  /usr/include/x86_64-linux-gnu/bits/types/locale_t.h \
  /usr/include/x86_64-linux-gnu/bits/types/__locale_t.h \
@@ -132,11 +132,11 @@ CMakeFiles/server.dir/server.cpp.o: \
  /usr/include/x86_64-linux-gnu/bits/types/error_t.h \
  /usr/include/c++/11/bits/charconv.h \
  /usr/include/c++/11/bits/basic_string.tcc /usr/include/assert.h \
- /home/dio/Begin/JsonRpcFramework/source/../build/release-install-cpp11/include/muduo/net/TcpConnection.h \
- /home/dio/Begin/JsonRpcFramework/source/../build/release-install-cpp11/include/muduo/base/StringPiece.h \
- /home/dio/Begin/JsonRpcFramework/source/../build/release-install-cpp11/include/muduo/net/Callbacks.h \
- /home/dio/Begin/JsonRpcFramework/source/../build/release-install-cpp11/include/muduo/base/Timestamp.h \
- /home/dio/Begin/JsonRpcFramework/source/../build/release-install-cpp11/include/muduo/base/copyable.h \
+ /home/dio/Begin/JsonRpcFramework/source/common/../../build/release-install-cpp11/include/muduo/net/TcpConnection.h \
+ /home/dio/Begin/JsonRpcFramework/source/common/../../build/release-install-cpp11/include/muduo/base/StringPiece.h \
+ /home/dio/Begin/JsonRpcFramework/source/common/../../build/release-install-cpp11/include/muduo/net/Callbacks.h \
+ /home/dio/Begin/JsonRpcFramework/source/common/../../build/release-install-cpp11/include/muduo/base/Timestamp.h \
+ /home/dio/Begin/JsonRpcFramework/source/common/../../build/release-install-cpp11/include/muduo/base/copyable.h \
  /usr/include/boost/operators.hpp /usr/include/c++/11/cstddef \
  /usr/include/c++/11/iterator /usr/include/c++/11/bits/stream_iterator.h \
  /usr/include/c++/11/bits/streambuf_iterator.h \
@@ -205,11 +205,11 @@ CMakeFiles/server.dir/server.cpp.o: \
  /usr/include/c++/11/backward/auto_ptr.h \
  /usr/include/c++/11/pstl/glue_memory_defs.h \
  /usr/include/c++/11/pstl/execution_defs.h \
- /home/dio/Begin/JsonRpcFramework/source/../build/release-install-cpp11/include/muduo/net/Buffer.h \
- /home/dio/Begin/JsonRpcFramework/source/../build/release-install-cpp11/include/muduo/net/Endian.h \
+ /home/dio/Begin/JsonRpcFramework/source/common/../../build/release-install-cpp11/include/muduo/net/Buffer.h \
+ /home/dio/Begin/JsonRpcFramework/source/common/../../build/release-install-cpp11/include/muduo/net/Endian.h \
  /usr/include/c++/11/algorithm \
  /usr/include/c++/11/pstl/glue_algorithm_defs.h \
- /home/dio/Begin/JsonRpcFramework/source/../build/release-install-cpp11/include/muduo/net/InetAddress.h \
+ /home/dio/Begin/JsonRpcFramework/source/common/../../build/release-install-cpp11/include/muduo/net/InetAddress.h \
  /usr/include/netinet/in.h /usr/include/x86_64-linux-gnu/sys/socket.h \
  /usr/include/x86_64-linux-gnu/bits/types/struct_iovec.h \
  /usr/include/x86_64-linux-gnu/bits/socket.h \
@@ -262,17 +262,17 @@ CMakeFiles/server.dir/server.cpp.o: \
  /usr/include/boost/type_traits/is_same.hpp /usr/include/c++/11/map \
  /usr/include/c++/11/bits/stl_tree.h /usr/include/c++/11/bits/stl_map.h \
  /usr/include/c++/11/bits/stl_multimap.h \
- /home/dio/Begin/JsonRpcFramework/source/../build/release-install-cpp11/include/muduo/net/EventLoop.h \
+ /home/dio/Begin/JsonRpcFramework/source/common/../../build/release-install-cpp11/include/muduo/net/EventLoop.h \
  /usr/include/c++/11/atomic \
- /home/dio/Begin/JsonRpcFramework/source/../build/release-install-cpp11/include/muduo/base/Mutex.h \
- /home/dio/Begin/JsonRpcFramework/source/../build/release-install-cpp11/include/muduo/base/CurrentThread.h \
- /home/dio/Begin/JsonRpcFramework/source/../build/release-install-cpp11/include/muduo/net/TimerId.h \
- /home/dio/Begin/JsonRpcFramework/source/../build/release-install-cpp11/include/muduo/base/CountDownLatch.h \
- /home/dio/Begin/JsonRpcFramework/source/../build/release-install-cpp11/include/muduo/base/Condition.h \
- /home/dio/Begin/JsonRpcFramework/source/../build/release-install-cpp11/include/muduo/net/EventLoopThread.h \
- /home/dio/Begin/JsonRpcFramework/source/../build/release-install-cpp11/include/muduo/base/Thread.h \
- /home/dio/Begin/JsonRpcFramework/source/../build/release-install-cpp11/include/muduo/net/TcpClient.h \
- /home/dio/Begin/JsonRpcFramework/source/detail.hpp \
+ /home/dio/Begin/JsonRpcFramework/source/common/../../build/release-install-cpp11/include/muduo/base/Mutex.h \
+ /home/dio/Begin/JsonRpcFramework/source/common/../../build/release-install-cpp11/include/muduo/base/CurrentThread.h \
+ /home/dio/Begin/JsonRpcFramework/source/common/../../build/release-install-cpp11/include/muduo/net/TimerId.h \
+ /home/dio/Begin/JsonRpcFramework/source/common/../../build/release-install-cpp11/include/muduo/base/CountDownLatch.h \
+ /home/dio/Begin/JsonRpcFramework/source/common/../../build/release-install-cpp11/include/muduo/base/Condition.h \
+ /home/dio/Begin/JsonRpcFramework/source/common/../../build/release-install-cpp11/include/muduo/net/EventLoopThread.h \
+ /home/dio/Begin/JsonRpcFramework/source/common/../../build/release-install-cpp11/include/muduo/base/Thread.h \
+ /home/dio/Begin/JsonRpcFramework/source/common/../../build/release-install-cpp11/include/muduo/net/TcpClient.h \
+ /home/dio/Begin/JsonRpcFramework/source/common/detail.hpp \
  /usr/include/c++/11/ctime /usr/include/c++/11/iostream \
  /usr/include/c++/11/ostream /usr/include/c++/11/ios \
  /usr/include/c++/11/bits/basic_ios.h \
@@ -331,10 +331,10 @@ CMakeFiles/server.dir/server.cpp.o: \
  /usr/include/c++/11/bits/locale_facets_nonio.tcc \
  /usr/include/c++/11/bits/locale_conv.h \
  /usr/include/c++/11/bits/quoted_string.h \
- /home/dio/Begin/JsonRpcFramework/source/fields.hpp \
- /home/dio/Begin/JsonRpcFramework/source/abstract.hpp \
+ /home/dio/Begin/JsonRpcFramework/source/common/fields.hpp \
+ /home/dio/Begin/JsonRpcFramework/source/common/abstract.hpp \
  /usr/include/arpa/inet.h /usr/include/c++/11/mutex \
  /usr/include/c++/11/bits/std_mutex.h \
  /usr/include/c++/11/bits/unique_lock.h \
- /home/dio/Begin/JsonRpcFramework/source/message.hpp \
- /home/dio/Begin/JsonRpcFramework/source/dispatcher.hpp
+ /home/dio/Begin/JsonRpcFramework/source/common/message.hpp \
+ /home/dio/Begin/JsonRpcFramework/source/common/dispatcher.hpp
