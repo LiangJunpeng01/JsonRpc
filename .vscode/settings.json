@@ -1,5 +1,5 @@
 {
-    "cmake.sourceDirectory": "/home/dio/Begin/JsonRpcFramework/source",
+    "cmake.sourceDirectory": "/home/dio/Begin/JsonRpcFramework/example/FutureTest",
     "files.associations": {
         "array": "cpp",
         "atomic": "cpp",

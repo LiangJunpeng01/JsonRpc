@@ -1,7 +1,0 @@
-[
-{
-  "directory": "/home/dio/Begin/JsonRpcFramework/source/client/build",
-  "command": "/usr/bin/c++  -I/home/dio/Begin/JsonRpcFramework/source/client../../build/release-install-cpp11/include  -o CMakeFiles/test.dir/test.cpp.o -c /home/dio/Begin/JsonRpcFramework/source/client/test.cpp",
-  "file": "/home/dio/Begin/JsonRpcFramework/source/client/test.cpp"
-}
-]

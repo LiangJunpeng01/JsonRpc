@@ -400,7 +400,7 @@ namespace Rpc
             return false;
         }
 
-        if (_body[KEY_OPTYPE].asInt() == (int)ServiceOptype::SERVICE_DISCOVERY /*判断是否为服务发现类型*/
+        if ((_body[KEY_OPTYPE].asInt() == (int)ServiceOptype::SERVICE_DISCOVERY) /*判断是否为服务发现类型*/
                 &&                                                             /*服务发现类型需要判断方法字段与主机信息字段是否存在且类型是否有效*/
                 (_body[KEY_METHOD].isNull()) ||
             (!_body[KEY_METHOD].isString()) ||
