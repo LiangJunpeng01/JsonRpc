@@ -120,7 +120,7 @@ namespace Rpc
         static std::string uuid();
     };
 
-    std::string uuid()
+    inline std::string UUID::uuid()
     {
         std::stringstream ss;
         // 1. 构造机器随机数对象

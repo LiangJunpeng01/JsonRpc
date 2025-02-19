@@ -412,8 +412,11 @@ CMakeFiles/client.dir/test.cpp.o: ../test.cpp \
   /usr/include/c++/11/future \
   /usr/include/c++/11/condition_variable \
   /usr/include/c++/11/bits/atomic_futex.h \
-  /usr/include/c++/11/bits/std_thread.h
+  /usr/include/c++/11/bits/std_thread.h \
+  ../rpc_caller.hpp
 
+
+../rpc_caller.hpp:
 
 /usr/include/arpa/inet.h:
 

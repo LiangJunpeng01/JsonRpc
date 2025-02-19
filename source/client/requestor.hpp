@@ -19,6 +19,8 @@ namespace Rpc
           // 主要提供send发送接口( 需要提供两个重载 回调发送和异步发送 )
           // 其次是提供一个对服务端响应的一个onResponse 通过 onResponse将消息传送给Dispatcher进行请求分发从而进行下一步的处理
         public:
+            using ptr = std::shared_ptr<Requestor>;
+
             using RequestCallback = std::function<void(const BaseMessage::ptr &)>;
             using AsyncResponse = std::future<BaseMessage::ptr>;
             struct RequestDescribe
@@ -35,7 +37,7 @@ namespace Rpc
             /* 为用户提供两个send接口 通过send接口向服务端发送数据*/
             bool send(const BaseConnection::ptr &, const BaseMessage::ptr &, const RequestCallback &); // 回调请求
 
-            bool send(const BaseConnection::ptr &, const BaseMessage::ptr &, const AsyncResponse &); // 异步请求
+            bool send(const BaseConnection::ptr &, const BaseMessage::ptr &, AsyncResponse &); // 异步请求
 
             bool send(const BaseConnection::ptr &, const BaseMessage::ptr &, BaseMessage::ptr &); // 同步请求
 
@@ -88,23 +90,48 @@ namespace Rpc
             {
                 ELOG("unknown request type:{ %d }\n", (int)describe->rtype);
             }
+            removeDescribe(res->rid());
         }
 
-        bool Requestor::send(const BaseConnection::ptr &connection, const BaseMessage::ptr &request, const RequestCallback &callback)
+        bool Requestor::send(const BaseConnection::ptr &con, const BaseMessage::ptr &req, const RequestCallback &callback)
         {
 
-            newDestribe(request, RType::REQ_CALLBACK, callback); // 创建一个请求描述
-                                                                 // newDestribe不会返回空指针 因此无需判断是否为空
-            connection->send(request);                           // 发送请求
+            auto rdp = newDestribe(req, RType::REQ_CALLBACK, callback); // 创建一个请求描述
+                                                                        // 留了一手 做个判断
+            if (!rdp.get())
+            {
+                ELOG("Requestor Destribe 对象构造失败\n");
+                return false;
+            }
+            con->send(req); // 发送请求
             return true;
         }
 
-        bool Requestor::send(const BaseConnection::ptr &connection, const BaseMessage::ptr &request, const AsyncResponse &async_resp)
+        bool Requestor::send(const BaseConnection::ptr &con, const BaseMessage::ptr &req, AsyncResponse &async_resp)
         {
+            auto rdp = newDestribe(req, RType::REQ_ASYNC); // 异步请求
+            if (rdp.get() == nullptr)
+            { // 一般情况下没有创建失败的可能
+              // 因为一般构造失败时对应的 newDescribe
+              // 函数中的 make_shared 将会提前抛异常终止程序向下运行
+                ELOG("Requestor Destribe 对象构造失败\n");
+                return false;
+            }
+            async_resp = rdp->response.get_future();
+            return true;
         }
 
-        bool Requestor::send(const BaseConnection::ptr &, const BaseMessage::ptr &, BaseMessage::ptr &) // 同步请求
-        {
+        bool Requestor::send(const BaseConnection::ptr &con, const BaseMessage::ptr &req, BaseMessage::ptr &rsp) // 同步请求
+        {                                                                                                        // 这里是一个同步操作
+            AsyncResponse rsp_future;                                                                            // 用于接收异步send中的future对象
+            bool ret = send(con, req, rsp_future);
+            if (!ret)
+            {
+                return false;
+            }
+
+            rsp = rsp_future.get(); // 可以直接get进行阻塞(同步) 需要将rsp进行返回
+            return true;
         }
 
         Requestor::RequestDescribe::ptr Requestor::newDestribe(const BaseMessage::ptr &req, RType rtype, const RequestCallback &cb)
