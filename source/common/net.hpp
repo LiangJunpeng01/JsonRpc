@@ -129,6 +129,8 @@ namespace Rpc
     {
         if (buf->readableSize() < valuelength_len)
         {
+            DLOG("当前可读数据:%ld\n", buf->readableSize());
+
             ELOG("数据不足\n");
             return false;
         }
@@ -248,13 +250,22 @@ namespace Rpc
     void MuduoConnection::shutdown()
     {
         _conn->shutdown();
+        DLOG("shutdown连接");
     }
 
     void MuduoConnection::send(const BaseMessage::ptr &msg)
     {
         std::string body = _protocol->serialize(msg);
+
+        ////////DEBUG↓//////////////
+        auto tmprdp = std::dynamic_pointer_cast<RpcRequest>(msg);
+        Json::Value tmpparms = tmprdp->params();
+
+        // DLOG("\nMTypd: %d\nMethod: %s\nParams: [%d,%d]\nRid: %s\n", tmprdp->mtype(), tmprdp->method().c_str(), tmpparms["num1"].asInt(), tmpparms["num2"].asInt(), tmprdp->rid().c_str());
+        ////////DEBUG↑//////////////
+
         _conn->send(body);
-        DLOG("MuduoConnection::send\n");
+        DLOG("MuduoConnection::send: \n");
     }
     class ConnectionFactory
     {
@@ -309,8 +320,11 @@ namespace Rpc
                                              std::placeholders::_1,
                                              std::placeholders::_2,
                                              std::placeholders::_3));
+
+        DLOG("服务器启动");
         _server.start();
         _baseloop.loop();
+        DLOG("开始时间监听");
     }
 
     void MuduoServer::onConnection(const muduo::net::TcpConnectionPtr &con)
@@ -367,6 +381,7 @@ namespace Rpc
                     ELOG("数据错误导致数据堆积 超过最大数据可读大小\n");
                     return;
                 }
+
                 break;
             }
             BaseMessage::ptr msg;
@@ -399,8 +414,9 @@ namespace Rpc
 
             if (_cb_message) // 如果用户设置了消息回调则调用消息回调
             {
-                DLOG("_cb_message回调被设置 调用该回调")
+                DLOG("_cb_message回调被设置 调用该回调");
                 _cb_message(base_con, msg);
+                DLOG("回调已调用");
             }
         }
     }
@@ -535,6 +551,7 @@ namespace Rpc
     void MuduoClient::shutdown()
     {
         _client.disconnect();
+        DLOG("shutdown 客客端关闭连接");
     }
 
     /* 消息发送 */

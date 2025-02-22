@@ -117,6 +117,16 @@ namespace Rpc
                 ELOG("Requestor Destribe 对象构造失败\n");
                 return false;
             }
+            DLOG("Rqeuestor Destribe 对象构造成功\n");
+            ////////DEBUG↓//////////////
+            // auto tmprdp = std::dynamic_pointer_cast<RpcRequest>(rdp->request);
+            // Json::Value tmpparms = tmprdp->params();
+
+            // DLOG("\nMTypd: %d\nMethod: %s\nParams: [%d,%d]\nRid: %s\n", tmprdp->mtype(), tmprdp->method().c_str(), tmpparms["num1"].asInt(), tmpparms["num2"].asInt(), tmprdp->rid().c_str());
+            ////////DEBUG↑//////////////
+            DLOG("Requestor::send 异步send 准备send");
+
+            con->send(req);
             async_resp = rdp->response.get_future();
             return true;
         }
@@ -124,12 +134,16 @@ namespace Rpc
         bool Requestor::send(const BaseConnection::ptr &con, const BaseMessage::ptr &req, BaseMessage::ptr &rsp) // 同步请求
         {                                                                                                        // 这里是一个同步操作
             AsyncResponse rsp_future;                                                                            // 用于接收异步send中的future对象
+            DLOG("Requestor 同步send 准备send");
+            // DLOG("req: %s", req->serialize().c_str());
+
             bool ret = send(con, req, rsp_future);
             if (!ret)
             {
+                DLOG("Requestor 同步send 失败\n");
                 return false;
             }
-
+            con->send(req);
             rsp = rsp_future.get(); // 可以直接get进行阻塞(同步) 需要将rsp进行返回
             return true;
         }

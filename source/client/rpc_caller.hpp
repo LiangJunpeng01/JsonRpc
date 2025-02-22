@@ -49,10 +49,9 @@ namespace Rpc
             req->setMethod(method);
             req->setParams(params);
             BaseMessage::ptr rsp;
-            DLOG("")
+            DLOG("请求组织成功\n");
 
-            con->send(req); // TODO 未调用
-            DLOG("同步请求发送\n");
+            DLOG("req: %s", req->serialize().c_str());
             // 发送请求
             if (!_requestor->send(con, std::dynamic_pointer_cast<BaseMessage>(req), rsp))
             {
@@ -60,6 +59,7 @@ namespace Rpc
                 return false;
             }
 
+            DLOG("请求发送\n");
             // 等待响应
             auto rsp_result = std::dynamic_pointer_cast<RpcResponse>(rsp);
             if (!rsp_result.get())
@@ -73,7 +73,9 @@ namespace Rpc
                 ELOG("Rpc请求错误: %s\n", errStr(rsp_result->rcode()).c_str());
                 return false;
             }
+
             result = rsp_result->result();
+            DLOG("结果被获取\n");
             return true;
         }
 
@@ -85,9 +87,6 @@ namespace Rpc
             req->setMethod(method);
             req->setParams(params);
 
-            con->send(req);
-
-            DLOG("异步请求发送\n");
             auto json_promise = std::make_shared<std::promise<Json::Value>>();
             result = json_promise->get_future(); // 获取相关联的future对象 上层最终将得到这样的future对象从而再次对future进行处理从而得到最终结果
 
@@ -112,9 +111,6 @@ namespace Rpc
             req->setMethod(method);
             req->setParams(params);
 
-            con->send(req);
-
-            DLOG("回调请求发送\n");
             Requestor::RequestCallback req_cb = std::bind(&RpcCaller::CallerCallback, this, cb, std::placeholders::_1); // bind 成了一个 void(const Rpc::BaseMessage::ptr &)类型的函数
 
             if (!_requestor->send(con, req, req_cb))
