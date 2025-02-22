@@ -12,7 +12,7 @@
 
 namespace Rpc
 {
-    namespace client
+    namespace Client
     {
         class Requestor
         { // 面向用户提供
@@ -32,7 +32,7 @@ namespace Rpc
                 RequestCallback callback;
             }; // struct RequestDescribe
 
-            void onResponse(BaseConnection::ptr &, BaseMessage::ptr &); // 注册进Dispatcher中的对响应进行的业务处理 需要调用 Callback
+            void onResponse(const BaseConnection::ptr &, BaseMessage::ptr &); // 注册进Dispatcher中的对响应进行的业务处理 需要调用 Callback
 
             /* 为用户提供两个send接口 通过send接口向服务端发送数据*/
             bool send(const BaseConnection::ptr &, const BaseMessage::ptr &, const RequestCallback &); // 回调请求
@@ -53,7 +53,7 @@ namespace Rpc
 
         }; // class Requestor
 
-        void Requestor::onResponse(BaseConnection::ptr &con, BaseMessage::ptr &res)
+        void Requestor::onResponse(const BaseConnection::ptr &con, BaseMessage::ptr &res)
         {
             /*
              通过rid找到对应的请求描述

@@ -61,6 +61,8 @@
         "internet": "cpp",
         "socket": "cpp",
         "*.ipp": "cpp",
-        "executor": "cpp"
+        "executor": "cpp",
+        "bitset": "cpp",
+        "variant": "cpp"
     }
 }

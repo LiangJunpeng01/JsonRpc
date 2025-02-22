@@ -27,7 +27,12 @@ namespace Rpc
 
     public:
         using ptr = std::shared_ptr<CallbackT<T>>;
-        using MessageCallback = std::function<void(const BaseConnection::ptr &, std::shared_ptr<T> &)>;
+        using MessageCallback = std::function<void(const BaseConnection::ptr &con, std::shared_ptr<T> &msg)>; // 此处采用了模板函数
+                                                                                                              // 原因为不同的消息类型有不同的处理方式
+                                                                                                              // 不同的Message类型有不同的处理方式
+                                                                                                              // 当接收到一个消息时，根据消息类型调用不同的处理函数
+                                                                                                              // 例如：当接收到一个RpcRequest消息时，调用RpcRouter::onRpcRequest
+
         CallbackT(const MessageCallback &handler) : _handler(handler) {}
         virtual void onMessage(const BaseConnection::ptr &con, BaseMessage::ptr &msg) override
         {

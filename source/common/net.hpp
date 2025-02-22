@@ -254,6 +254,7 @@ namespace Rpc
     {
         std::string body = _protocol->serialize(msg);
         _conn->send(body);
+        DLOG("MuduoConnection::send\n");
     }
     class ConnectionFactory
     {
