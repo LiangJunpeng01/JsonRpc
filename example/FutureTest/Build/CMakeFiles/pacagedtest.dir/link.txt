@@ -1,1 +1,0 @@
-/usr/bin/c++ CMakeFiles/pacagedtest.dir/packagedtest.cpp.o -o pacagedtest  -lpthread 

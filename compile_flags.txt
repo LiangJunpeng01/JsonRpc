@@ -1,0 +1,6 @@
+-I/home/dio/Begin/JsonRpcFramework/build/release-install-cpp11/include
+-L/home/dio/Begin/JsonRpcFramework/build/release-install-cpp11/lib
+-std=c++11
+-lmuduo_net
+-lmuduo_base
+-lpthread

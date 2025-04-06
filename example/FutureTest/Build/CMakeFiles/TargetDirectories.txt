@@ -1,5 +1,0 @@
-/home/dio/Begin/JsonRpcFramework/example/FutureTest/Build/CMakeFiles/async.dir
-/home/dio/Begin/JsonRpcFramework/example/FutureTest/Build/CMakeFiles/pacaged.dir
-/home/dio/Begin/JsonRpcFramework/example/FutureTest/Build/CMakeFiles/promise.dir
-/home/dio/Begin/JsonRpcFramework/example/FutureTest/Build/CMakeFiles/edit_cache.dir
-/home/dio/Begin/JsonRpcFramework/example/FutureTest/Build/CMakeFiles/rebuild_cache.dir
