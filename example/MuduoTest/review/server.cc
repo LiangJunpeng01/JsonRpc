@@ -62,10 +62,12 @@ void DictServer::on_message(
   std::string msg = buf->retrieveAllAsString(); // 全部取出
   std::string ret;
 
+  std::cout << "获取翻译内容: " << msg << std::endl;
   auto it = dict.find(msg); // 判断是否找到
 
   if (it == dict.end()) {
     ret = "未匹配";
+    std::cout << "内容: " << msg << " 不匹配词库" << std::endl;
   } else {
     ret = it->second;
   }
@@ -82,7 +84,7 @@ void DictServer::start() {
 int main() {
   //  std::cout << "server" <<std::endl;
 
-  DictServer server(8088);
+  DictServer server(8099);
   server.start();
   return 0;
 }

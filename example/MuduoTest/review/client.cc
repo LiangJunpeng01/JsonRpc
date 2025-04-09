@@ -20,7 +20,7 @@ class DictClient {
 
 public:
   DictClient(const std::string &sip, int sport);
-  void send(const std::string &msg);
+  bool send(const std::string &msg);
 
 private:
   void on_connection(const muduo::net::TcpConnectionPtr &);
@@ -50,7 +50,14 @@ DictClient::DictClient(const std::string &sip, int sport)
   _count_down_latch.wait(); // 连接发起后进行等待 (connect本身为非阻塞)
 }
 
-void DictClient::send(const std::string &msg) { if () }
+bool DictClient::send(const std::string &msg) {
+  if (!_con->connected()) { // 判断连接是否建立
+    std::cout << "连接未建立" << std::endl;
+    return false;
+  }
+  _con->send(msg);
+  return true;
+}
 
 void DictClient::on_connection(const muduo::net::TcpConnectionPtr &cb) {
   if (cb->connected()) { // 使用connected判断连接是否建立
@@ -62,10 +69,19 @@ void DictClient::on_connection(const muduo::net::TcpConnectionPtr &cb) {
   }
 }
 
-void DictClient::on_message(const muduo::net::TcpConnectionPtr &,
-                            muduo::net::Buffer *, muduo::Timestamp) {}
+void DictClient::on_message(const muduo::net::TcpConnectionPtr &cb,
+                            muduo::net::Buffer *buf, muduo::Timestamp) {
+  // 消息回调 - 客户端主要对服务端发出的响应进行读取与打印
+  std::string res = buf->retrieveAllAsString();
+  std::cout << res << std::endl;
+}
 
 int main() {
-  std::cout << "hello world" << std::endl;
+  DictClient client("127.0.0.1", 8099);
+  while (1) {
+    std::string msg;
+    std::cin >> msg;
+    client.send(msg);
+  }
   return 0;
 }
