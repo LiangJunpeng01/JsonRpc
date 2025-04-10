@@ -1,5 +1,7 @@
 #include <iostream>
 
+#include <functional>
+
 #include <muduo/net/TcpClient.h>
 
 #include <muduo/net/TcpConnection.h>
