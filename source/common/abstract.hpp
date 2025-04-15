@@ -58,8 +58,10 @@ private:
 class BaseBuffer {
   /*
    * BaseBuffer 主要的目的是封装Muduo库中的Buffer的基类
-   * Muduo 库主要基于事件触发, 因此当消息事件或者连接事件到来时
-   *
+   * Muduo 库主要基于事件触发, 因此当消息事件或者连接事件到来时,
+   * 对应的消息内容将直接存储在Buffer中 因此需要从Buffer中读取对应的数据
+   * 所有的消息数据都在Buffer中, 因此需要封装Muduo::Buffer,
+   * 调用对应的函数来获取对应数据(Buffer的封装较为简单)
    */
 public:
   /* 获取可读数据大小 */
@@ -81,7 +83,13 @@ public:
 };
 
 class BaseProtocol {
-
+  /*
+   * BaseProtocol 是为了给LV_Protocol 做准备
+   * 实际上这个协议是用来制定一个规则,
+   * 在Protocol模块中的成员变量都是用来定义规则的 如各个部分定长的长度
+   * 同时Protocol定义了一套来判断, 并解析数据的一套方式,
+   * 包括最终序列化为二进制流的string对象
+   */
 public:
   using ptr = std::shared_ptr<BaseProtocol>;
 

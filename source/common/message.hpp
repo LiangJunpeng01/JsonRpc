@@ -38,6 +38,10 @@ protected:
 };
 
 std::string JsonMessag::serialize() {
+  /*
+   * 此处的 serialize 本质上是将不同消息的Json类型统一序列化为一个string对象,
+   * 这个string对象将成为 L-V Protocol 中的body部分
+   */
   std::string body;
   bool ret = JSON::serialize(_body, body);
   if (!ret) {
