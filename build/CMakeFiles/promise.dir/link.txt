@@ -1,0 +1,1 @@
+/usr/bin/g++ -g CMakeFiles/promise.dir/promisetest.cpp.o -o promise  -lpthread 

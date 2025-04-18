@@ -1,0 +1,17 @@
+[
+{
+  "directory": "/home/dio/Begin/JsonRpcFramework/build",
+  "command": "/usr/bin/g++   -g -o CMakeFiles/async.dir/asynctest.cpp.o -c /home/dio/Begin/JsonRpcFramework/example/FutureTest/asynctest.cpp",
+  "file": "/home/dio/Begin/JsonRpcFramework/example/FutureTest/asynctest.cpp"
+},
+{
+  "directory": "/home/dio/Begin/JsonRpcFramework/build",
+  "command": "/usr/bin/g++   -g -o CMakeFiles/pacaged.dir/packagedtest.cpp.o -c /home/dio/Begin/JsonRpcFramework/example/FutureTest/packagedtest.cpp",
+  "file": "/home/dio/Begin/JsonRpcFramework/example/FutureTest/packagedtest.cpp"
+},
+{
+  "directory": "/home/dio/Begin/JsonRpcFramework/build",
+  "command": "/usr/bin/g++   -g -o CMakeFiles/promise.dir/promisetest.cpp.o -c /home/dio/Begin/JsonRpcFramework/example/FutureTest/promisetest.cpp",
+  "file": "/home/dio/Begin/JsonRpcFramework/example/FutureTest/promisetest.cpp"
+}
+]

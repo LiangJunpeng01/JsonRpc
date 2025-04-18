@@ -1,0 +1,1 @@
+/usr/bin/c++ -g CMakeFiles/Test.dir/test.cpp.o -o Test   -L/home/dio/Begin/JsonRpcFramework/source/test/../../build/release-install-cpp11/lib  -Wl,-rpath,/home/dio/Begin/JsonRpcFramework/source/test/../../build/release-install-cpp11/lib -lmuduo_net -lmuduo_base -lpthread -ljsoncpp 
