@@ -14,17 +14,17 @@ include_directories(${INCLUDE_DIR})
 
 link_directories(${LIB_DIR})
 
-add_executable(serverTest server.cpp)
+add_executable(server_test server.cpp)
 
-target_link_libraries(serverTest  muduo_net muduo_base pthread jsoncpp)
+target_link_libraries(server_test  muduo_net muduo_base pthread jsoncpp)
 
-add_executable(clientTest client.cpp)
+add_executable(client_test client.cpp)
 
-target_link_libraries(clientTest  muduo_net muduo_base pthread jsoncpp)
+target_link_libraries(client_test  muduo_net muduo_base pthread jsoncpp)
 
-add_executable(Test test.cpp)
+add_executable(test test.cpp)
 
-target_link_libraries(Test  muduo_net muduo_base pthread jsoncpp)
+target_link_libraries(test  muduo_net muduo_base pthread jsoncpp)
 
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
