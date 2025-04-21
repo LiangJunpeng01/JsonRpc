@@ -224,6 +224,8 @@ void service_message_test() {
   std::cout << "IP: " << srp_req->host().first << std::endl
             << "Port: " << srp_req->host().second << std::endl;
 
+  std::cout << "-------------------------------------------" << std::endl;
+
   /////////////////////// Response ///////////////////////
 
   Rpc::ServiceResponse::ptr rsp =
@@ -236,6 +238,47 @@ void service_message_test() {
   hosts.push_back({"127.0.0.3", 8088});
 
   rsp->setHosts(hosts);
+
+  rsp->setMethod("Add");
+
+  rsp->setServiceOptype(Rpc::ServiceOptype::SERVICE_DISCOVERY);
+
+  rsp->setId(Rpc::UUID::uuid());
+
+  rsp->setMType(Rpc::MType::RSP_SERVICE);
+
+  rsp->setRCode(Rpc::RCode::RCODE_OK);
+
+  std::string rsp_body = rsp->serialize();
+
+  std::cout << rsp_body << std::endl;
+
+  Rpc::BaseMessage::ptr bmp_rsp =
+      Rpc::MessageFactory::create(Rpc::MType::RSP_SERVICE);
+
+  bmp_rsp->unserialize(rsp_body);
+
+  if (bmp_rsp->check()) {
+    ILOG("bmp_rsp->check() ok");
+  } else {
+    ELOG("bmp_rsp->check() ng");
+  }
+
+  Rpc::ServiceResponse::ptr srp_rsp =
+      std::dynamic_pointer_cast<Rpc::ServiceResponse>(bmp_rsp);
+
+  if (srp_rsp->check()) {
+    ILOG("srp_rsp->check() ok");
+  } else
+    ELOG("srp_rsp->check() ng");
+
+  std::cout << srp_rsp->method() << std::endl;
+  std::cout << (int)srp_rsp->rcode() << std::endl;
+  std::cout << (int)srp_rsp->serviceOptype() << std::endl;
+  for (auto it : srp_rsp->hosts()) {
+    std::cout << "IP: " << it.first << std::endl;
+    std::cout << "Port: " << it.second << std::endl;
+  }
 }
 
 int main() {

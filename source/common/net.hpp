@@ -33,6 +33,12 @@ namespace Rpc {
 /* -------------------- MuduoBuffer -------------------- */
 
 class MuduoBuffer : public BaseBuffer {
+  /*
+   * Muduo库是基于Reactor模型所编写
+   * 因此基于事件触发
+   * 当某事件被触发时, 将存在于MuduoBuffer中,
+   * 因此需要封装MuduoBuffer来进行更好的数据处理
+   */
 public:
   using ptr = std::shared_ptr<MuduoBuffer>;
 
@@ -60,7 +66,11 @@ private:
 
 size_t MuduoBuffer::readableSize() { return _buf->readableBytes(); }
 
-int32_t MuduoBuffer::peekInt32() { return _buf->peekInt32(); }
+int32_t MuduoBuffer::peekInt32() {
+  return _buf->peekInt32();
+} // 从MuduoBuffer中读取的数据无需进行二次的字节序转换
+  // 陈硕大佬在开发过程中认为所有获取的数据都是网络字节序的数据
+  // 因此无需转换为主机字节序以免数据错误
 
 void MuduoBuffer::retrieveInt32() { _buf->retrieveInt32(); }
 
@@ -80,6 +90,12 @@ public:
 
 /* -------------------- LVProtocol -------------------- */
 
+/*
+ * Protocol 模块负责序列化与反序列化
+ * 实际上是应用层中的协议
+ * 当MuduoBuffer收到一条消息后需要再Protocol中进行处理成一条完整的消息
+ */
+
 class LVProtocol : public BaseProtocol {
 public:
   using ptr = std::shared_ptr<LVProtocol>;
@@ -98,9 +114,9 @@ public:
 
 private:
   /*
-      |--valueLength--|/// value ///|
-          /                  ↓                   \
-         |--Mtype--|--IDLength--|--MID--|--Body--|
+      |--valueLength--|///            value              ///|
+                     /                  ↓                   \
+                    |--Mtype--|--IDLength--|--MID--|--Body--|
   */
   int32_t valuelength_len = 4;
 
@@ -132,17 +148,20 @@ bool LVProtocol::canProtocol(const BaseBuffer::ptr &buf) {
   return true;
 }
 
+// 在上层调用中, 当一条消息经过了canProtocol
+// 判断后才会调用onMessage进行数据的处理
 bool LVProtocol::onMessage(const BaseBuffer::ptr &buf, BaseMessage::ptr &msg) {
-  int32_t total_len = buf->readInt32();
-  MType mtype = (MType)buf->readInt32();
+  int32_t total_len = buf->readInt32();  // 读取总体长度Length
+  MType mtype = (MType)buf->readInt32(); // 读取类型
   // DLOG("LVProtocol::onMessage->mtype: %d\n", (int)mtype);
-  int32_t id_len = buf->readInt32();
-  std::string mid = buf->retrieveAsString(id_len);
-  int32_t body_len = total_len - id_len - idlength_len - mtype_len;
-  std::string body = buf->retrieveAsString(body_len);
+  int32_t id_len = buf->readInt32();               // 读取ID长度
+  std::string mid = buf->retrieveAsString(id_len); // 读取ID
+  int32_t body_len =
+      total_len - id_len - idlength_len - mtype_len;  // 计算正文body长度
+  std::string body = buf->retrieveAsString(body_len); // 读取正文body
 
   msg = MessageFactory::create(mtype);
-  if (msg.get() == nullptr) {
+  if (msg.get() == nullptr) { // 通过智能指针中的get来判断消息类型构造是否成功
     ELOG("LVProtocol 构造消息对象时类型错误: %d\n", (int)mtype);
     return false;
   }
@@ -161,31 +180,41 @@ bool LVProtocol::onMessage(const BaseBuffer::ptr &buf, BaseMessage::ptr &msg) {
 
 std::string LVProtocol::serialize(const BaseMessage::ptr &msg) {
 
+  /*
+      |--valueLength--|///            value              ///|
+                     /                  ↓                   \
+                    |--Mtype--|--IDLength--|--MID--|--Body--|
+  */
+
   // DLOG("LVProtocol 序列化前msg->mtype: %d\n", (int)msg->mtype());
   // TODO
 
   // 序列化
-  std::string id = msg->rid();
+  std::string id = msg->rid(); // 获取对应的id
 
-  std::string body = msg->serialize();
+  std::string body =
+      msg->serialize(); // 对Message消息进行序列化为一个对应的body部分
 
   // DLOG("Protocol 序列化成功: %s\n", body.c_str());
 
   // 手动转成网络字节序 - muduo库会进行一次网络字节序转主机字节序
   // 因此先手动转换为网络字节序 (跨平台一致性)
-  MType h_mtype = msg->mtype();
-  MType n_mtype = (MType)htonl((int32_t)msg->mtype());
 
-  int32_t h_id_length = id.size();
-  int32_t n_id_length = htonl(id.size());
+  MType h_mtype = msg->mtype(); // 获取Mtype
+  MType n_mtype =
+      (MType)htonl((int32_t)msg->mtype()); // 将MType转化为网络字节序
+
+  int32_t h_id_length = id.size();        // 获取ID长度
+  int32_t n_id_length = htonl(id.size()); // 将ID长度转化为网络字节序
 
   int32_t total_length =
-      htonl(body.size() + mtype_len + h_id_length + idlength_len);
+      htonl(body.size() + mtype_len + h_id_length +
+            idlength_len); // 计算获取总长度 并把总长度转化为网络字节序
 
   std::string result;
-  result.reserve(total_length); // 预先开辟空间
+  result.reserve(total_length); // 对result预先开辟空间
 
-  // 采用二进制的方式
+  // 采用二进制的方式组织整个LV格式的报文
   result.append((char *)&total_length, valuelength_len);
   result.append((char *)&n_mtype, mtype_len);
   result.append((char *)&n_id_length, idlength_len);
