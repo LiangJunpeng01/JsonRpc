@@ -233,6 +233,11 @@ public:
 
 /* -------------------- MuduoConnection -------------------- */
 
+/*
+ * MuduoConnection 用于为客户端和服务端提供连接稳定的检查与连接的关闭
+ * 并为客户端/服务端提供了send发送接口
+ */
+
 class MuduoConnection : public BaseConnection {
 public:
   using ptr = std::shared_ptr<MuduoConnection>;
@@ -262,6 +267,9 @@ void MuduoConnection::shutdown() {
 }
 
 void MuduoConnection::send(const BaseMessage::ptr &msg) {
+  // 当客户端/服务端需要send发送时, 将会接收上层的msg, 并通过Protocol中的
+  // serialize序列化为一个保存二进制数据流的string对象
+  // 并通过send进行发送
   std::string body = _protocol->serialize(msg);
 
   ////////DEBUG↓//////////////
@@ -288,6 +296,9 @@ public:
 /* -------------------- MuduoServer -------------------- */
 
 class MuduoServer : public BaseServer {
+  /*
+   * 主要用于封装Muduo库中的TcpServer
+   */
 public:
   using ptr = std::shared_ptr<MuduoServer>;
 
