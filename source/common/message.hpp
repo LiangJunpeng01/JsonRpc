@@ -14,6 +14,8 @@
 
 #include "abstract.hpp"
 
+#include <cassert>
+
 namespace Rpc {
 class JsonMessag : public BaseMessage {
   /*
@@ -159,7 +161,10 @@ void RpcRequest::setMethod(const std::string &_method) {
   _body[KEY_METHOD] = _method;
 }
 
-Json::Value RpcRequest::params() { return _body[KEY_PARAMS]; }
+Json::Value RpcRequest::params() {
+  assert(this != nullptr);
+  return _body[KEY_PARAMS];
+}
 
 void RpcRequest::setParams(const Json::Value &_params) {
   _body[KEY_PARAMS] = _params;
