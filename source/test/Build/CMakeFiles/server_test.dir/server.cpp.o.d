@@ -1,8 +1,7 @@
 CMakeFiles/server_test.dir/server.cpp.o: \
  /home/dio/Begin/JsonRpcFramework/source/test/server.cpp \
- /usr/include/stdc-predef.h \
- /home/dio/Begin/JsonRpcFramework/source/test/../common/message.hpp \
- /usr/include/c++/13/iostream /usr/include/c++/13/bits/requires_hosted.h \
+ /usr/include/stdc-predef.h /usr/include/c++/13/iostream \
+ /usr/include/c++/13/bits/requires_hosted.h \
  /usr/include/x86_64-linux-gnu/c++/13/bits/c++config.h \
  /usr/include/x86_64-linux-gnu/c++/13/bits/os_defines.h \
  /usr/include/features.h /usr/include/features-time64.h \
@@ -150,8 +149,9 @@ CMakeFiles/server_test.dir/server.cpp.o: \
  /usr/include/c++/13/bits/locale_facets.tcc \
  /usr/include/c++/13/bits/basic_ios.tcc \
  /usr/include/c++/13/bits/ostream.tcc /usr/include/c++/13/istream \
- /usr/include/c++/13/bits/istream.tcc /usr/include/c++/13/memory \
- /usr/include/c++/13/bits/stl_tempbuf.h \
+ /usr/include/c++/13/bits/istream.tcc \
+ /home/dio/Begin/JsonRpcFramework/source/test/../common/message.hpp \
+ /usr/include/c++/13/memory /usr/include/c++/13/bits/stl_tempbuf.h \
  /usr/include/c++/13/bits/stl_uninitialized.h \
  /usr/include/c++/13/bits/stl_raw_storage_iter.h \
  /usr/include/c++/13/bits/align.h \
@@ -348,5 +348,4 @@ CMakeFiles/server_test.dir/server.cpp.o: \
  /usr/include/arpa/inet.h /usr/include/c++/13/mutex \
  /usr/include/c++/13/bits/std_mutex.h \
  /usr/include/c++/13/bits/unique_lock.h \
- /home/dio/Begin/JsonRpcFramework/source/test/../common/dispatcher.hpp \
- /home/dio/Begin/JsonRpcFramework/source/test/../server/rpc_router.hpp
+ /home/dio/Begin/JsonRpcFramework/source/test/../common/dispatcher.hpp

@@ -186,7 +186,7 @@ std::string LVProtocol::serialize(const BaseMessage::ptr &msg) {
                     |--Mtype--|--IDLength--|--MID--|--Body--|
   */
 
-  // DLOG("LVProtocol 序列化前msg->mtype: %d\n", (int)msg->mtype());
+  DLOG("LVProtocol 序列化前msg->mtype: %d\n", (int)msg->mtype());
   // TODO
 
   // 序列化
@@ -195,7 +195,7 @@ std::string LVProtocol::serialize(const BaseMessage::ptr &msg) {
   std::string body =
       msg->serialize(); // 对Message消息进行序列化为一个对应的body部分
 
-  // DLOG("Protocol 序列化成功: %s\n", body.c_str());
+  DLOG("Protocol 序列化成功: %s\n", body.c_str());
 
   // 手动转成网络字节序 - muduo库会进行一次网络字节序转主机字节序
   // 因此先手动转换为网络字节序 (跨平台一致性)
@@ -328,7 +328,7 @@ private:
   std::unordered_map<muduo::net::TcpConnectionPtr, BaseConnection::ptr> _conns;
   BaseProtocol::ptr _protocol;
 
-  const size_t maxSize = (1 << 16);
+  const size_t maxSize = (1 << 16); // buffer的最大限制
 };
 
 void MuduoServer::start() {
@@ -376,7 +376,8 @@ void MuduoServer::onConnection(const muduo::net::TcpConnectionPtr &con) {
 
 void MuduoServer::onMessage(const muduo::net::TcpConnectionPtr &con,
                             muduo::net::Buffer *buf, muduo::Timestamp) {
-  auto base_buf = BufferFactory::create(buf);
+  auto base_buf =
+      BufferFactory::create(buf); // 根据net::Buffer构造一个BaseBuffer
 
   DLOG("服务端接收到新数据\n");
   while (1) {
@@ -501,7 +502,7 @@ void MuduoClient::onConnection(const muduo::net::TcpConnectionPtr &con) {
 
 void MuduoClient::onMessage(const muduo::net::TcpConnectionPtr &con,
                             muduo::net::Buffer *buf, muduo::Timestamp) {
-  auto base_buf = BufferFactory::create(buf);
+  auto base_buf = BufferFactory::create(buf); // 构建一个Buffer对象
 
   while (1) {
     if (!_protocol->canProtocol(base_buf)) {

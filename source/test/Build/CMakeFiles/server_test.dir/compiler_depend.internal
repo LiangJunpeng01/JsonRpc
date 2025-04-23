@@ -30,7 +30,6 @@ CMakeFiles/server_test.dir/server.cpp.o
  /home/dio/Begin/JsonRpcFramework/source/common/fields.hpp
  /home/dio/Begin/JsonRpcFramework/source/common/message.hpp
  /home/dio/Begin/JsonRpcFramework/source/common/net.hpp
- /home/dio/Begin/JsonRpcFramework/source/server/rpc_router.hpp
  /usr/include/alloca.h
  /usr/include/arpa/inet.h
  /usr/include/asm-generic/bitsperlong.h
