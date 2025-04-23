@@ -211,8 +211,12 @@ std::string LVProtocol::serialize(const BaseMessage::ptr &msg) {
       htonl(body.size() + mtype_len + h_id_length +
             idlength_len); // 计算获取总长度 并把总长度转化为网络字节序
 
+  DLOG("开辟的大小 %d", total_length + valuelength_len);
+
+  DLOG("需要组织的大小 %d",
+       valuelength_len + mtype_len + idlength_len + id.size() + body.size());
   std::string result;
-  result.reserve(total_length); // 对result预先开辟空间
+  result.reserve(total_length + valuelength_len); // 对result预先开辟空间
 
   // 采用二进制的方式组织整个LV格式的报文
   result.append((char *)&total_length, valuelength_len);
@@ -221,6 +225,7 @@ std::string LVProtocol::serialize(const BaseMessage::ptr &msg) {
   result.append(id);
   result.append(body);
 
+  DLOG("LVProtocol 整体组织完毕");
   return result;
 }
 
