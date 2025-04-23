@@ -195,7 +195,7 @@ std::string LVProtocol::serialize(const BaseMessage::ptr &msg) {
   std::string body =
       msg->serialize(); // 对Message消息进行序列化为一个对应的body部分
 
-  DLOG("Protocol 序列化成功: %s\n", body.c_str());
+  //  DLOG("Protocol 序列化成功: %s\n", body.c_str());
 
   // 手动转成网络字节序 - muduo库会进行一次网络字节序转主机字节序
   // 因此先手动转换为网络字节序 (跨平台一致性)
@@ -207,19 +207,23 @@ std::string LVProtocol::serialize(const BaseMessage::ptr &msg) {
   int32_t h_id_length = id.size();        // 获取ID长度
   int32_t n_id_length = htonl(id.size()); // 将ID长度转化为网络字节序
 
-  int32_t total_length =
+  int32_t h_total_length =
+      body.size() + mtype_len + h_id_length +
+      idlength_len; // 计算获取总长度 并把总长度转化为网络字节序
+
+  int32_t n_total_length =
       htonl(body.size() + mtype_len + h_id_length +
             idlength_len); // 计算获取总长度 并把总长度转化为网络字节序
 
-  DLOG("开辟的大小 %d", total_length + valuelength_len);
+  // DLOG("开辟的大小 %d", h_total_length + valuelength_len);
 
-  DLOG("需要组织的大小 %d",
-       valuelength_len + mtype_len + idlength_len + id.size() + body.size());
+  // DLOG("需要组织的大小 %d",valuelength_len + mtype_len + idlength_len +
+  // id.size() + body.size());
   std::string result;
-  result.reserve(total_length + valuelength_len); // 对result预先开辟空间
+  result.reserve(h_total_length + valuelength_len); // 对result预先开辟空间
 
   // 采用二进制的方式组织整个LV格式的报文
-  result.append((char *)&total_length, valuelength_len);
+  result.append((char *)&n_total_length, valuelength_len);
   result.append((char *)&n_mtype, mtype_len);
   result.append((char *)&n_id_length, idlength_len);
   result.append(id);
