@@ -282,8 +282,10 @@ void MuduoConnection::send(const BaseMessage::ptr &msg) {
   std::string body = _protocol->serialize(msg);
 
   ////////DEBUG↓//////////////
-  auto tmprdp = std::dynamic_pointer_cast<RpcRequest>(msg);
-  Json::Value tmpparms = tmprdp->params();
+  //  auto tmprdp = std::dynamic_pointer_cast<RpcRequest>(msg);
+  //
+  //
+  //  Json::Value tmpparms = tmprdp->params();
 
   // DLOG("\nMTypd: %d\nMethod: %s\nParams: [%d,%d]\nRid: %s\n",
   // tmprdp->mtype(), tmprdp->method().c_str(), tmpparms["num1"].asInt(),

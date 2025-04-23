@@ -162,7 +162,8 @@ void RpcRequest::setMethod(const std::string &_method) {
 }
 
 Json::Value RpcRequest::params() {
-  assert(this != nullptr);
+  DLOG("Do a assert to debug");
+  assert(this);
   return _body[KEY_PARAMS];
 }
 

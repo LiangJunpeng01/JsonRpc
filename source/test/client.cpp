@@ -4,6 +4,8 @@
 
 #include <thread>
 
+#include <chrono>
+
 #include "../common/message.hpp"
 
 #include "../common/dispatcher.hpp"
@@ -16,6 +18,7 @@
 
 void onClientMessage(const Rpc::BaseConnection::ptr &conn,
                      Rpc::BaseMessage::ptr &msg) {
+  std::cout << "client get a new message" << std::endl;
   std::string body = msg->serialize();
 
   std::cout << body << std::endl;
@@ -43,6 +46,10 @@ void clientTest() {
   rpc_req->setParams(root);
 
   client->send(rpc_req);
+
+  std::this_thread::sleep_for(std::chrono::seconds(3));
+
+  client->shutdown();
 }
 
 int main() {
