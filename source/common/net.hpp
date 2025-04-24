@@ -203,22 +203,19 @@ std::string LVProtocol::serialize(const BaseMessage::ptr &msg) {
   MType h_mtype = msg->mtype(); // 获取Mtype
   MType n_mtype =
       (MType)htonl((int32_t)msg->mtype()); // 将MType转化为网络字节序
-
-  int32_t h_id_length = id.size();        // 获取ID长度
+  int32_t h_id_length = id.size();         // 获取ID长度
   int32_t n_id_length = htonl(id.size()); // 将ID长度转化为网络字节序
-
-  int32_t h_total_length =
-      body.size() + mtype_len + h_id_length +
-      idlength_len; // 计算获取总长度 并把总长度转化为网络字节序
-
+  int32_t h_total_length = body.size() + mtype_len + h_id_length + idlength_len;
   int32_t n_total_length =
       htonl(body.size() + mtype_len + h_id_length +
             idlength_len); // 计算获取总长度 并把总长度转化为网络字节序
 
-  // DLOG("开辟的大小 %d", h_total_length + valuelength_len);
+  //  DLOG("开辟的大小 %d", h_total_length + valuelength_len);
+  //
+  //  DLOG("需要组织的大小 %d",
+  //       valuelength_len + mtype_len + idlength_len + id.size() +
+  //       body.size());
 
-  // DLOG("需要组织的大小 %d",valuelength_len + mtype_len + idlength_len +
-  // id.size() + body.size());
   std::string result;
   result.reserve(h_total_length + valuelength_len); // 对result预先开辟空间
 

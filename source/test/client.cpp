@@ -52,7 +52,66 @@ void clientTest() {
   client->shutdown();
 }
 
+//////////////////////////// DispatcherTest ////////////////////////////
+
+void dispatcherOnRpcResponse(const Rpc::BaseConnection::ptr &con,
+                             Rpc::RpcResponse::ptr &msg) {
+  std::cout << "get a rpc_response:" << std::endl;
+  std::string body = msg->serialize();
+  std::cout << body << std::endl;
+}
+
+void dispatcherOnTopicResponse(const Rpc::BaseConnection::ptr &con,
+                               Rpc::TopicResponse::ptr &msg) {
+
+  std::cout << "get a topic_response:" << std::endl;
+  std::string body = msg->serialize();
+  std::cout << body << std::endl;
+}
+void dispatcherTest() {
+  auto dispatcher = std::make_shared<Rpc::Dispatcher>();
+  dispatcher->registerHandler<Rpc::RpcResponse>(Rpc::MType::RSP_RPC,
+                                                dispatcherOnRpcResponse);
+
+  dispatcher->registerHandler<Rpc::TopicResponse>(Rpc::MType::RSP_TOPIC,
+                                                  dispatcherOnTopicResponse);
+  auto client = Rpc::ClientFactory::create("127.0.0.1", 9090);
+
+  auto message_cb = std::bind(&Rpc::Dispatcher::onMessage, dispatcher.get(),
+                              std::placeholders::_1, std::placeholders::_2);
+  client->setMessageCallback(message_cb);
+
+  client->connect();
+
+  Rpc::RpcRequest::ptr rrp = Rpc::MessageFactory::create<Rpc::RpcRequest>();
+  rrp->setId(Rpc::UUID::uuid());
+  rrp->setMType(Rpc::MType::REQ_RPC);
+  rrp->setMethod("This is Test Method");
+  Json::Value params_1;
+  params_1["test num1"] = 12;
+  params_1["test num2"] = 34;
+  rrp->setParams(params_1);
+
+  Rpc::TopicRequest::ptr trp = Rpc::MessageFactory::create<Rpc::TopicRequest>();
+  trp->setId(Rpc::UUID::uuid());
+  trp->setMType(Rpc::MType::REQ_TOPIC);
+  trp->setTopicOptype(Rpc::TopicOptype::TOPIC_PUBLISH);
+  trp->setTopicKey("sport");
+  trp->setTopicMsg("This is a Test for topic - (sport)");
+
+  client->send(rrp);
+  client->send(trp);
+
+  std::this_thread::sleep_for(std::chrono::seconds(2));
+
+  client->shutdown();
+}
+
 int main() {
-  clientTest();
+
+  // clientTest();
+
+  dispatcherTest();
+
   return 0;
 }
