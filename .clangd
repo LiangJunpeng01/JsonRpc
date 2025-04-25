@@ -1,4 +1,4 @@
 CompileFlags:
   Add: 
     - "-I/home/dio/Begin/JsonRpcFramework/build/release-install-cpp11/include"
-    - "-std=c++11"
+    - "-std=c++17"
