@@ -13,6 +13,11 @@
 namespace Rpc {
 namespace Client {
 class Requestor {
+  /*
+   * Requestor 模块负责管理所有的请求,
+   * 包括rpc与topic或者后续增加的其他类型的请求
+   */
+
   // 面向用户提供
   // 主要提供send发送接口( 需要提供两个重载 回调发送和异步发送 )
   // 其次是提供一个对服务端响应的一个onResponse
@@ -76,8 +81,10 @@ private:
 
 }; // class Requestor
 
-void Requestor::onResponse(const BaseConnection::ptr &con,
-                           BaseMessage::ptr &res) {
+void Requestor::onResponse(
+    const BaseConnection::ptr &con,
+    BaseMessage::ptr
+        &res) { // 通常情况下onResponse函数是注册进Dispatcher中的回调函数
   /*
    通过rid找到对应的请求描述
    若未找到则表示该响应不存在对应的请求描述
@@ -86,8 +93,8 @@ void Requestor::onResponse(const BaseConnection::ptr &con,
    若rtype为RType::ASYNC 则调用promise的set_value
    处理完毕后删除对应的请求描述 以免内存泄漏
   */
-  auto describe = getDescribe(res->rid());
-  if (describe.get() == nullptr) {
+  auto describe = getDescribe(res->rid()); // 通过rid获取对应的describe请求描述
+  if (describe.get() == nullptr) { // 如果未找到对应的请求描述
     ELOG("not found request describe for response rid:{ %s }\n",
          res->rid().c_str());
     return; // 未找到对应的请求描述 无需处理
@@ -126,6 +133,12 @@ bool Requestor::send(const BaseConnection::ptr &con,
 
 bool Requestor::send(const BaseConnection::ptr &con,
                      const BaseMessage::ptr &req, AsyncResponse &async_resp) {
+
+  // send时需要构建一个异步请求描述对象用于管理请求
+  // AsyncResponse是一个future对象同时也是一个输出型参数
+  // 上层调用该send将会返回一个对应的future对象
+  // 通过future对象的
+
   auto rdp = newDestribe(req, RType::REQ_ASYNC); // 异步请求
   if (rdp.get() ==
       nullptr) { // 一般情况下没有创建失败的可能
@@ -134,16 +147,9 @@ bool Requestor::send(const BaseConnection::ptr &con,
     ELOG("Requestor Destribe 对象构造失败\n");
     return false;
   }
-  DLOG("Rqeuestor Destribe 对象构造成功\n");
-  ////////DEBUG↓//////////////
-  // auto tmprdp = std::dynamic_pointer_cast<RpcRequest>(rdp->request);
-  // Json::Value tmpparms = tmprdp->params();
 
-  // DLOG("\nMTypd: %d\nMethod: %s\nParams: [%d,%d]\nRid: %s\n",
-  // tmprdp->mtype(), tmprdp->method().c_str(), tmpparms["num1"].asInt(),
-  // tmpparms["num2"].asInt(), tmprdp->rid().c_str());
-  ////////DEBUG↑//////////////
-  DLOG("Requestor::send 异步send 准备send");
+  //   DLOG("Rqeuestor Destribe 对象构造成功\n");
+  //  DLOG("Requestor::send 异步send 准备send");
 
   con->send(req);
   async_resp = rdp->response.get_future();
